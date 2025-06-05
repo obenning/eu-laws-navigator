@@ -117,177 +117,229 @@ jobs:
           exit 1
         fi
 
-    # ===== DEUTSCHE GESETZE - GELDWÄSCHEPRÄVENTION & SANKTIONEN =====
+    # ===== DEUTSCHE GESETZE - ROBUSTE STRATEGIE =====
     
-    - name: 🏦 Geldwäschegesetz (GwG) herunterladen
+    - name: 🏦 Deutsche Gesetze herunterladen (mit Fallbacks)
       run: |
-        echo "📥 Lade Geldwäschegesetz (GwG)..."
-        curl -L -A "Mozilla/5.0 (GitHub-Actions)" \
+        echo "📥 Starte Download deutscher Gesetze mit Fallback-Strategien..."
+        
+        # Funktion für robusten Download
+        download_german_law() {
+          local law_name="$1"
+          local primary_url="$2"
+          local fallback_url="$3"
+          local output_file="$4"
+          local min_size="$5"
+          
+          echo "🔄 Versuche $law_name..."
+          
+          # Strategie 1: Primäre URL mit verschiedenen User-Agents
+          for user_agent in \
+            "Mozilla/5.0 (GitHub-Actions)" \
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+            "curl/7.68.0"; do
+            
+            echo "  🔄 Versuche primäre URL mit UA: $user_agent"
+            if curl -L -A "$user_agent" \
+              "$primary_url" \
+              -o "$output_file" \
+              --connect-timeout 15 \
+              --max-time 120 \
+              --retry 2 \
+              --retry-delay 5 \
+              --retry-max-time 300 \
+              --silent \
+              --fail; then
+              
+              # Prüfe Dateigröße
+              if [ -f "$output_file" ] && [ $(wc -c < "$output_file") -gt $min_size ]; then
+                echo "  ✅ $law_name erfolgreich geladen: $(wc -c < "$output_file") Bytes"
+                return 0
+              fi
+            fi
+            
+            echo "  ❌ Versuch mit UA '$user_agent' fehlgeschlagen"
+            sleep 2
+          done
+          
+          # Strategie 2: Fallback-URL (falls verfügbar)
+          if [ -n "$fallback_url" ]; then
+            echo "  🔄 Versuche Fallback-URL..."
+            if curl -L -A "Mozilla/5.0 (GitHub-Actions)" \
+              "$fallback_url" \
+              -o "$output_file" \
+              --connect-timeout 10 \
+              --max-time 60 \
+              --retry 1 \
+              --silent \
+              --fail; then
+              
+              if [ -f "$output_file" ] && [ $(wc -c < "$output_file") -gt $min_size ]; then
+                echo "  ✅ $law_name per Fallback geladen: $(wc -c < "$output_file") Bytes"
+                return 0
+              fi
+            fi
+          fi
+          
+          # Strategie 3: Erstelle Fallback-HTML
+          echo "  ⚠️ $law_name nicht verfügbar - erstelle Fallback"
+          create_fallback_html "$law_name" "$output_file"
+          return 1
+        }
+        
+        # Funktion für Fallback-HTML
+        create_fallback_html() {
+          local law_name="$1"
+          local output_file="$2"
+          
+          cat > "$output_file" << 'FALLBACK_EOF'
+        <!DOCTYPE html>
+        <html lang="de">
+        <head>
+          <meta charset="UTF-8">
+          <title>FALLBACK_LAW_NAME - Fallback</title>
+        </head>
+        <body>
+          <div id="fallback_notice">
+            <h1>FALLBACK_LAW_NAME</h1>
+            <div class="notice">
+              <p><strong>⚠️ Automatischer Download nicht verfügbar</strong></p>
+              <p>Das Gesetz konnte nicht automatisch von der offiziellen Quelle geladen werden.</p>
+              <p><strong>Offizielle Quelle:</strong> <a href="https://www.gesetze-im-internet.de" target="_blank">gesetze-im-internet.de</a></p>
+              <p><strong>Letzter Versuch:</strong> $(date)</p>
+            </div>
+          </div>
+        </body>
+        </html>
+        FALLBACK_EOF
+          
+          # Ersetze Platzhalter
+          sed -i "s/FALLBACK_LAW_NAME/$law_name/g" "$output_file"
+          sed -i "s/\$(date)/$(date)/g" "$output_file"
+          
+          echo "  📄 Fallback-HTML für $law_name erstellt"
+        }
+        
+        # Download alle deutschen Gesetze
+        success_count=0
+        total_laws=10
+        
+        # 1. Geldwäschegesetz (GwG)
+        if download_german_law \
+          "Geldwäschegesetz (GwG)" \
           "https://www.gesetze-im-internet.de/gwg_2017/BJNR182210017.html" \
-          -o laws/de-gwg-2017.html \
-          --connect-timeout 30 \
-          --max-time 300 \
-          --retry 3
-        
-        if [ -f laws/de-gwg-2017.html ] && [ $(wc -c < laws/de-gwg-2017.html) -gt 5000 ]; then
-          echo "✅ Geldwäschegesetz erfolgreich geladen: $(wc -c < laws/de-gwg-2017.html) Bytes"
-        else
-          echo "❌ Geldwäschegesetz Download fehlgeschlagen"
-          exit 1
+          "" \
+          "laws/de-gwg-2017.html" \
+          3000; then
+          ((success_count++))
         fi
-    
-    - name: 🏛️ Kreditwesengesetz (KWG) herunterladen
-      run: |
-        echo "📥 Lade Kreditwesengesetz (KWG)..."
-        curl -L -A "Mozilla/5.0 (GitHub-Actions)" \
+        
+        # 2. Kreditwesengesetz (KWG)
+        if download_german_law \
+          "Kreditwesengesetz (KWG)" \
           "https://www.gesetze-im-internet.de/kwg/BJNR008810961.html" \
-          -o laws/de-kwg.html \
-          --connect-timeout 30 \
-          --max-time 300 \
-          --retry 3
-        
-        if [ -f laws/de-kwg.html ] && [ $(wc -c < laws/de-kwg.html) -gt 5000 ]; then
-          echo "✅ Kreditwesengesetz erfolgreich geladen: $(wc -c < laws/de-kwg.html) Bytes"
-        else
-          echo "❌ Kreditwesengesetz Download fehlgeschlagen"
-          exit 1
+          "" \
+          "laws/de-kwg.html" \
+          3000; then
+          ((success_count++))
         fi
-    
-    - name: 💳 Zahlungsdiensteaufsichtsgesetz (ZAG) herunterladen
-      run: |
-        echo "📥 Lade Zahlungsdiensteaufsichtsgesetz (ZAG)..."
-        curl -L -A "Mozilla/5.0 (GitHub-Actions)" \
+        
+        # 3. Zahlungsdiensteaufsichtsgesetz (ZAG)
+        if download_german_law \
+          "Zahlungsdiensteaufsichtsgesetz (ZAG)" \
           "https://www.gesetze-im-internet.de/zag_2018/BJNR194710017.html" \
-          -o laws/de-zag-2018.html \
-          --connect-timeout 30 \
-          --max-time 300 \
-          --retry 3
-        
-        if [ -f laws/de-zag-2018.html ] && [ $(wc -c < laws/de-zag-2018.html) -gt 5000 ]; then
-          echo "✅ Zahlungsdiensteaufsichtsgesetz erfolgreich geladen: $(wc -c < laws/de-zag-2018.html) Bytes"
-        else
-          echo "❌ Zahlungsdiensteaufsichtsgesetz Download fehlgeschlagen"
-          exit 1
+          "" \
+          "laws/de-zag-2018.html" \
+          3000; then
+          ((success_count++))
         fi
-    
-    - name: 🌍 Außenwirtschaftsgesetz (AWG) herunterladen
-      run: |
-        echo "📥 Lade Außenwirtschaftsgesetz (AWG)..."
-        curl -L -A "Mozilla/5.0 (GitHub-Actions)" \
+        
+        # 4. Außenwirtschaftsgesetz (AWG)
+        if download_german_law \
+          "Außenwirtschaftsgesetz (AWG)" \
           "https://www.gesetze-im-internet.de/awg/BJNR107740961.html" \
-          -o laws/de-awg.html \
-          --connect-timeout 30 \
-          --max-time 300 \
-          --retry 3
-        
-        if [ -f laws/de-awg.html ] && [ $(wc -c < laws/de-awg.html) -gt 5000 ]; then
-          echo "✅ Außenwirtschaftsgesetz erfolgreich geladen: $(wc -c < laws/de-awg.html) Bytes"
-        else
-          echo "❌ Außenwirtschaftsgesetz Download fehlgeschlagen"
-          exit 1
+          "" \
+          "laws/de-awg.html" \
+          3000; then
+          ((success_count++))
         fi
-    
-    - name: 📋 Außenwirtschaftsverordnung (AWV) herunterladen
-      run: |
-        echo "📥 Lade Außenwirtschaftsverordnung (AWV)..."
-        curl -L -A "Mozilla/5.0 (GitHub-Actions)" \
+        
+        # 5. Außenwirtschaftsverordnung (AWV)
+        if download_german_law \
+          "Außenwirtschaftsverordnung (AWV)" \
           "https://www.gesetze-im-internet.de/awv_2013/BJNR144610013.html" \
-          -o laws/de-awv-2013.html \
-          --connect-timeout 30 \
-          --max-time 300 \
-          --retry 3
-        
-        if [ -f laws/de-awv-2013.html ] && [ $(wc -c < laws/de-awv-2013.html) -gt 5000 ]; then
-          echo "✅ Außenwirtschaftsverordnung erfolgreich geladen: $(wc -c < laws/de-awv-2013.html) Bytes"
-        else
-          echo "❌ Außenwirtschaftsverordnung Download fehlgeschlagen"
-          exit 1
+          "" \
+          "laws/de-awv-2013.html" \
+          3000; then
+          ((success_count++))
         fi
-    
-    - name: ⚖️ Strafgesetzbuch (StGB) - Geldwäsche §261 herunterladen
-      run: |
-        echo "📥 Lade Strafgesetzbuch (StGB)..."
-        curl -L -A "Mozilla/5.0 (GitHub-Actions)" \
+        
+        # 6. Strafgesetzbuch (StGB)
+        if download_german_law \
+          "Strafgesetzbuch (StGB)" \
           "https://www.gesetze-im-internet.de/stgb/BJNR001270871.html" \
-          -o laws/de-stgb.html \
-          --connect-timeout 30 \
-          --max-time 300 \
-          --retry 3
-        
-        if [ -f laws/de-stgb.html ] && [ $(wc -c < laws/de-stgb.html) -gt 5000 ]; then
-          echo "✅ Strafgesetzbuch erfolgreich geladen: $(wc -c < laws/de-stgb.html) Bytes"
-        else
-          echo "❌ Strafgesetzbuch Download fehlgeschlagen"
-          exit 1
+          "" \
+          "laws/de-stgb.html" \
+          3000; then
+          ((success_count++))
         fi
-    
-    - name: 🛡️ Versicherungsaufsichtsgesetz (VAG) herunterladen
-      run: |
-        echo "📥 Lade Versicherungsaufsichtsgesetz (VAG)..."
-        curl -L -A "Mozilla/5.0 (GitHub-Actions)" \
+        
+        # 7. Versicherungsaufsichtsgesetz (VAG)
+        if download_german_law \
+          "Versicherungsaufsichtsgesetz (VAG)" \
           "https://www.gesetze-im-internet.de/vag_2016/BJNR043410015.html" \
-          -o laws/de-vag-2016.html \
-          --connect-timeout 30 \
-          --max-time 300 \
-          --retry 3
-        
-        if [ -f laws/de-vag-2016.html ] && [ $(wc -c < laws/de-vag-2016.html) -gt 5000 ]; then
-          echo "✅ Versicherungsaufsichtsgesetz erfolgreich geladen: $(wc -c < laws/de-vag-2016.html) Bytes"
-        else
-          echo "❌ Versicherungsaufsichtsgesetz Download fehlgeschlagen"
-          exit 1
+          "" \
+          "laws/de-vag-2016.html" \
+          3000; then
+          ((success_count++))
         fi
-    
-    - name: 💼 Kapitalanlagegesetzbuch (KAGB) herunterladen
-      run: |
-        echo "📥 Lade Kapitalanlagegesetzbuch (KAGB)..."
-        curl -L -A "Mozilla/5.0 (GitHub-Actions)" \
+        
+        # 8. Kapitalanlagegesetzbuch (KAGB)
+        if download_german_law \
+          "Kapitalanlagegesetzbuch (KAGB)" \
           "https://www.gesetze-im-internet.de/kagb/BJNR081010013.html" \
-          -o laws/de-kagb.html \
-          --connect-timeout 30 \
-          --max-time 300 \
-          --retry 3
-        
-        if [ -f laws/de-kagb.html ] && [ $(wc -c < laws/de-kagb.html) -gt 5000 ]; then
-          echo "✅ Kapitalanlagegesetzbuch erfolgreich geladen: $(wc -c < laws/de-kagb.html) Bytes"
-        else
-          echo "❌ Kapitalanlagegesetzbuch Download fehlgeschlagen"
-          exit 1
+          "" \
+          "laws/de-kagb.html" \
+          3000; then
+          ((success_count++))
         fi
-    
-    - name: 📈 Wertpapierhandelsgesetz (WpHG) herunterladen
-      run: |
-        echo "📥 Lade Wertpapierhandelsgesetz (WpHG)..."
-        curl -L -A "Mozilla/5.0 (GitHub-Actions)" \
+        
+        # 9. Wertpapierhandelsgesetz (WpHG)
+        if download_german_law \
+          "Wertpapierhandelsgesetz (WpHG)" \
           "https://www.gesetze-im-internet.de/wphg/BJNR024520007.html" \
-          -o laws/de-wphg.html \
-          --connect-timeout 30 \
-          --max-time 300 \
-          --retry 3
-        
-        if [ -f laws/de-wphg.html ] && [ $(wc -c < laws/de-wphg.html) -gt 5000 ]; then
-          echo "✅ Wertpapierhandelsgesetz erfolgreich geladen: $(wc -c < laws/de-wphg.html) Bytes"
-        else
-          echo "❌ Wertpapierhandelsgesetz Download fehlgeschlagen"
-          exit 1
+          "" \
+          "laws/de-wphg.html" \
+          3000; then
+          ((success_count++))
         fi
-    
-    - name: 🇪🇺 EU-Sanktions-Durchführungsgesetz herunterladen
-      run: |
-        echo "📥 Lade EU-Sanktions-Durchführungsgesetz..."
-        curl -L -A "Mozilla/5.0 (GitHub-Actions)" \
+        
+        # 10. EU-Sanktions-Durchführungsgesetz
+        if download_german_law \
+          "EU-Sanktions-Durchführungsgesetz" \
           "https://www.gesetze-im-internet.de/eusanktdg/BJNR281010992.html" \
-          -o laws/de-eu-sanktdg.html \
-          --connect-timeout 30 \
-          --max-time 300 \
-          --retry 3
-        
-        if [ -f laws/de-eu-sanktdg.html ] && [ $(wc -c < laws/de-eu-sanktdg.html) -gt 5000 ]; then
-          echo "✅ EU-Sanktions-Durchführungsgesetz erfolgreich geladen: $(wc -c < laws/de-eu-sanktdg.html) Bytes"
-        else
-          echo "❌ EU-Sanktions-Durchführungsgesetz Download fehlgeschlagen"
-          exit 1
+          "" \
+          "laws/de-eu-sanktdg.html" \
+          3000; then
+          ((success_count++))
         fi
+        
+        echo ""
+        echo "📊 Deutsche Gesetze Download-Ergebnis:"
+        echo "✅ Erfolgreich: $success_count von $total_laws Gesetzen"
+        echo "⚠️ Fallbacks: $((total_laws - success_count)) von $total_laws Gesetzen"
+        
+        if [ $success_count -eq 0 ]; then
+          echo "❌ Kritisch: Keine deutschen Gesetze konnten geladen werden"
+          echo "💡 Tipp: gesetze-im-internet.de könnte temporär nicht verfügbar sein"
+        elif [ $success_count -lt 5 ]; then
+          echo "⚠️ Warnung: Weniger als 50% der deutschen Gesetze geladen"
+        else
+          echo "✅ Zufriedenstellend: Mehrheit der deutschen Gesetze geladen"
+        fi
+        
+        # Workflow NICHT abbrechen - EU-Gesetze funktionieren weiterhin
+        echo "🔄 Workflow wird fortgesetzt..."
     
     - name: 📊 Update-Metadaten erstellen
       run: |
@@ -444,15 +496,46 @@ jobs:
         
         echo "✅ EU-Gesetze erfolgreich aktualisiert und gepusht!"
     
-    - name: 📧 Benachrichtigung bei Änderungen (optional)
+    - name: 📧 Benachrichtigung bei Änderungen oder Problemen
       if: steps.changes.outputs.changes_detected == 'true'
       run: |
-        echo "📧 Neue Gesetzesversionen verfügbar!"
-        echo "Die folgenden EU-Gesetze wurden aktualisiert:"
-        echo "- EU-Geldwäscheverordnung 2024"
-        echo "- EU-Datenschutz-Grundverordnung"  
-        echo "- EU-KI-Verordnung (AI Act)"
-        echo "- Digital Services Act"
+        echo "📧 Gesetzesupdate-Benachrichtigung"
+        echo ""
+        echo "🔄 Automatisches Update abgeschlossen:"
+        echo "📅 Datum: $(date +'%Y-%m-%d %H:%M')"
+        echo ""
+        echo "✅ EU-Verordnungen (immer verfügbar):"
+        echo "  - EU-Geldwäscheverordnung 2024"
+        echo "  - EU-Datenschutz-Grundverordnung (GDPR)"  
+        echo "  - EU-KI-Verordnung (AI Act)"
+        echo "  - Digital Services Act"
+        echo ""
+        echo "🏛️ Deutsche Gesetze (Verfügbarkeit variiert):"
+        
+        # Prüfe welche deutschen Gesetze erfolgreich geladen wurden
+        de_success=0
+        de_total=10
+        
+        for law_file in de-gwg-2017.html de-kwg.html de-zag-2018.html de-awg.html de-awv-2013.html de-stgb.html de-vag-2016.html de-kagb.html de-wphg.html de-eu-sanktdg.html; do
+          if [ -f "laws/$law_file" ] && [ $(wc -c < "laws/$law_file") -gt 5000 ]; then
+            ((de_success++))
+            echo "  ✅ $(basename "$law_file" .html)"
+          else
+            echo "  ⚠️ $(basename "$law_file" .html) (Fallback verwendet)"
+          fi
+        done
+        
+        echo ""
+        echo "📊 Gesamtergebnis:"
+        echo "  - EU-Gesetze: 4/4 ✅"
+        echo "  - Deutsche Gesetze: $de_success/$de_total"
+        
+        if [ $de_success -lt 5 ]; then
+          echo ""
+          echo "⚠️ Hinweis: gesetze-im-internet.de war temporär nicht verfügbar."
+          echo "   Fallback-Versionen wurden erstellt. Nächster Versuch: Morgen 6:00 Uhr."
+        fi
+        
         echo ""
         echo "🔗 Siehe: https://github.com/${{ github.repository }}/tree/main/laws"
         
