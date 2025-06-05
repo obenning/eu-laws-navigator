@@ -447,7 +447,8 @@
             <div class="euaml-info-banner">
                 <span>🤖</span>
                 <span>
-                    <strong>Täglich automatisch aktualisiert</strong> um 6:00 Uhr von EUR-Lex via 
+                    <strong>Täglich automatisch aktualisiert</strong> um 6:00 Uhr | 
+                    EU-Verordnungen: zuverlässig | Deutsche Gesetze: best-effort via 
                     <a href="#" class="euaml-github-link" id="githubLink" target="_blank">GitHub Actions</a>
                 </span>
             </div>
@@ -596,7 +597,7 @@
                 }
             };
             
-            var currentLaw = 'eu_aml_2024';
+            var currentLaw = 'eu_aml_2024'; // Starte mit EU-Gesetz (zuverlässiger)
             var sections = [];
             var articleContents = new Map();
             var searchTimeout = null;
@@ -676,11 +677,52 @@
                     lastUpdateTime = new Date(metadata.last_update);
                     
                     console.log('✅ Metadaten geladen - Letztes Update:', lastUpdateTime.toLocaleString('de-DE'));
+                    
+                    // Analyse der verfügbaren Gesetze
+                    let euCount = 0;
+                    let deCount = 0;
+                    let deTotal = 0;
+                    
+                    for (const [key, law] of Object.entries(metadata.laws || {})) {
+                        if (law.type === 'eu-regulation') {
+                            euCount++;
+                        } else if (law.type === 'german-law') {
+                            deTotal++;
+                            if (law.size > 5000) { // Größer als Fallback
+                                deCount++;
+                            }
+                        }
+                    }
+                    
+                    // Zeige Status in der Info-Banner
+                    updateAvailabilityStatus(euCount, deCount, deTotal);
+                    
                     return metadata;
                     
                 } catch (error) {
                     console.warn('Metadaten konnten nicht geladen werden:', error);
                     return null;
+                }
+            }
+            
+            function updateAvailabilityStatus(euCount, deCount, deTotal) {
+                const banner = document.querySelector('.euaml-info-banner span:last-child');
+                if (banner && deTotal > 0) {
+                    const deStatus = deCount === deTotal ? 'alle verfügbar' : 
+                                   deCount === 0 ? 'Fallbacks verwendet' : 
+                                   `${deCount}/${deTotal} verfügbar`;
+                    
+                    banner.innerHTML = `
+                        <strong>Täglich automatisch aktualisiert</strong> um 6:00 Uhr | 
+                        EU-Verordnungen: ${euCount}/4 ✅ | Deutsche Gesetze: ${deStatus} | 
+                        <a href="#" class="euaml-github-link" id="githubLink" target="_blank">GitHub Actions</a>
+                    `;
+                    
+                    // GitHub-Link neu setzen
+                    const newGithubLink = document.getElementById('githubLink');
+                    if (newGithubLink) {
+                        newGithubLink.href = `https://github.com/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repository}/tree/${GITHUB_CONFIG.branch}/laws`;
+                    }
                 }
             }
             
@@ -1408,7 +1450,11 @@
                             formatEUContent(content);
                         }
                     } else if (lawConfig.type === 'german-law') {
-                        formatGermanContent(content);
+                        // Prüfe zuerst auf Fallback-Inhalt
+                        if (!handleFallbackContent(content)) {
+                            // Nur formatieren wenn es kein Fallback ist
+                            formatGermanContent(content);
+                        }
                     }
 
                     var cleanContent = content.innerHTML.trim();
