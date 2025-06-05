@@ -15,6 +15,9 @@ on:
     paths:
       - '.github/workflows/update-laws.yml'
 
+permissions:
+  contents: write  # Ermöglicht das Schreiben in das Repository
+
 jobs:
   update-eu-laws:
     runs-on: ubuntu-latest
