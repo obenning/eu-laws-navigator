@@ -1,0 +1,196 @@
+# .github/workflows/update-laws.yml
+name: 🇪🇺 EU-Gesetze Auto-Update
+
+on:
+  # Täglich um 6:00 Uhr MEZ
+  schedule:
+    - cron: '0 4 * * *'  # 4 UTC = 6 MEZ im Winter, 5 MEZ im Sommer
+  
+  # Manuell auslösbar über GitHub Interface
+  workflow_dispatch:
+  
+  # Bei Push auf main branch (für Tests)
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/update-laws.yml'
+
+jobs:
+  update-eu-laws:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📂 Repository auschecken
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: 📁 Laws-Ordner erstellen
+      run: mkdir -p laws
+      
+    - name: 🏛️ EU-Geldwäscheverordnung 2024 herunterladen
+      run: |
+        echo "📥 Lade EU-Geldwäscheverordnung 2024..."
+        curl -L -A "Mozilla/5.0 (GitHub-Actions)" \
+          "https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32024R1624" \
+          -o laws/eu-aml-2024.html \
+          --connect-timeout 30 \
+          --max-time 300 \
+          --retry 3
+        
+        # Prüfe ob Datei gültig ist
+        if [ -f laws/eu-aml-2024.html ] && [ $(wc -c < laws/eu-aml-2024.html) -gt 10000 ]; then
+          echo "✅ EU-Geldwäscheverordnung erfolgreich geladen: $(wc -c < laws/eu-aml-2024.html) Bytes"
+        else
+          echo "❌ EU-Geldwäscheverordnung Download fehlgeschlagen"
+          exit 1
+        fi
+    
+    - name: 🔒 EU-Datenschutz-Grundverordnung (GDPR) herunterladen
+      run: |
+        echo "📥 Lade GDPR..."
+        curl -L -A "Mozilla/5.0 (GitHub-Actions)" \
+          "https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679" \
+          -o laws/eu-gdpr-2016.html \
+          --connect-timeout 30 \
+          --max-time 300 \
+          --retry 3
+        
+        if [ -f laws/eu-gdpr-2016.html ] && [ $(wc -c < laws/eu-gdpr-2016.html) -gt 10000 ]; then
+          echo "✅ GDPR erfolgreich geladen: $(wc -c < laws/eu-gdpr-2016.html) Bytes"
+        else
+          echo "❌ GDPR Download fehlgeschlagen"
+          exit 1
+        fi
+        
+    - name: 🤖 EU-KI-Verordnung (AI Act) herunterladen
+      run: |
+        echo "📥 Lade AI Act..."
+        curl -L -A "Mozilla/5.0 (GitHub-Actions)" \
+          "https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32024R1689" \
+          -o laws/eu-ai-act-2024.html \
+          --connect-timeout 30 \
+          --max-time 300 \
+          --retry 3
+        
+        if [ -f laws/eu-ai-act-2024.html ] && [ $(wc -c < laws/eu-ai-act-2024.html) -gt 10000 ]; then
+          echo "✅ AI Act erfolgreich geladen: $(wc -c < laws/eu-ai-act-2024.html) Bytes"
+        else
+          echo "❌ AI Act Download fehlgeschlagen"
+          exit 1
+        fi
+        
+    - name: 🌐 Digital Services Act (DSA) herunterladen
+      run: |
+        echo "📥 Lade DSA..."
+        curl -L -A "Mozilla/5.0 (GitHub-Actions)" \
+          "https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32022R2065" \
+          -o laws/eu-dsa-2022.html \
+          --connect-timeout 30 \
+          --max-time 300 \
+          --retry 3
+        
+        if [ -f laws/eu-dsa-2022.html ] && [ $(wc -c < laws/eu-dsa-2022.html) -gt 10000 ]; then
+          echo "✅ DSA erfolgreich geladen: $(wc -c < laws/eu-dsa-2022.html) Bytes"
+        else
+          echo "❌ DSA Download fehlgeschlagen"
+          exit 1
+        fi
+    
+    - name: 📊 Update-Metadaten erstellen
+      run: |
+        echo "📊 Erstelle Metadaten..."
+        cat > laws/last-update.json << 'EOF'
+        {
+          "last_update": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+          "laws": {
+            "eu-aml-2024": {
+              "name": "EU-Geldwäscheverordnung 2024",
+              "celex": "32024R1624",
+              "file": "eu-aml-2024.html",
+              "size": $(wc -c < laws/eu-aml-2024.html)
+            },
+            "eu-gdpr-2016": {
+              "name": "EU-Datenschutz-Grundverordnung",
+              "celex": "32016R0679", 
+              "file": "eu-gdpr-2016.html",
+              "size": $(wc -c < laws/eu-gdpr-2016.html)
+            },
+            "eu-ai-act-2024": {
+              "name": "EU-KI-Verordnung (AI Act)",
+              "celex": "32024R1689",
+              "file": "eu-ai-act-2024.html", 
+              "size": $(wc -c < laws/eu-ai-act-2024.html)
+            },
+            "eu-dsa-2022": {
+              "name": "Digital Services Act",
+              "celex": "32022R2065",
+              "file": "eu-dsa-2022.html",
+              "size": $(wc -c < laws/eu-dsa-2022.html)
+            }
+          }
+        }
+        EOF
+        
+        # Ersetze die Variablen
+        sed -i "s/\$(date -u +\"%Y-%m-%dT%H:%M:%SZ\")/$(date -u +"%Y-%m-%dT%H:%M:%SZ")/g" laws/last-update.json
+        sed -i "s/\$(wc -c < laws\/eu-aml-2024.html)/$(wc -c < laws/eu-aml-2024.html)/g" laws/last-update.json
+        sed -i "s/\$(wc -c < laws\/eu-gdpr-2016.html)/$(wc -c < laws/eu-gdpr-2016.html)/g" laws/last-update.json
+        sed -i "s/\$(wc -c < laws\/eu-ai-act-2024.html)/$(wc -c < laws/eu-ai-act-2024.html)/g" laws/last-update.json
+        sed -i "s/\$(wc -c < laws\/eu-dsa-2022.html)/$(wc -c < laws/eu-dsa-2022.html)/g" laws/last-update.json
+        
+        echo "✅ Metadaten erstellt:"
+        cat laws/last-update.json
+    
+    - name: 🔍 Änderungen prüfen
+      id: changes
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "changes_detected=true" >> $GITHUB_OUTPUT
+          echo "📝 Änderungen an den Gesetzen erkannt:"
+          git status --porcelain
+        else
+          echo "changes_detected=false" >> $GITHUB_OUTPUT
+          echo "✅ Keine Änderungen erkannt - Gesetze sind aktuell"
+        fi
+    
+    - name: 💾 Änderungen committen und pushen
+      if: steps.changes.outputs.changes_detected == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "EU-Laws Auto-Update Bot"
+        
+        git add laws/
+        git commit -m "🤖 Automatisches Update der EU-Gesetze - $(date +'%Y-%m-%d %H:%M')"
+        
+        echo "🚀 Pushe Updates zum Repository..."
+        git push
+        
+        echo "✅ EU-Gesetze erfolgreich aktualisiert und gepusht!"
+    
+    - name: 📧 Benachrichtigung bei Änderungen (optional)
+      if: steps.changes.outputs.changes_detected == 'true'
+      run: |
+        echo "📧 Neue Gesetzesversionen verfügbar!"
+        echo "Die folgenden EU-Gesetze wurden aktualisiert:"
+        echo "- EU-Geldwäscheverordnung 2024"
+        echo "- EU-Datenschutz-Grundverordnung"  
+        echo "- EU-KI-Verordnung (AI Act)"
+        echo "- Digital Services Act"
+        echo ""
+        echo "🔗 Siehe: https://github.com/${{ github.repository }}/tree/main/laws"
+        
+        # Hier könnten Sie später E-Mail oder Slack-Benachrichtigungen hinzufügen
+    
+    - name: ✅ Workflow-Zusammenfassung
+      run: |
+        echo "🎉 EU-Gesetze Auto-Update abgeschlossen!"
+        echo ""
+        echo "📊 Statistiken:"
+        echo "- EU-Geldwäscheverordnung: $(wc -c < laws/eu-aml-2024.html) Bytes"
+        echo "- GDPR: $(wc -c < laws/eu-gdpr-2016.html) Bytes"  
+        echo "- AI Act: $(wc -c < laws/eu-ai-act-2024.html) Bytes"
+        echo "- DSA: $(wc -c < laws/eu-dsa-2022.html) Bytes"
+        echo ""
+        echo "⏰ Nächstes Update: Morgen um 6:00 Uhr MEZ"
+        echo "🔗 Verfügbar unter: https://github.com/${{ github.repository }}/tree/main/laws"
