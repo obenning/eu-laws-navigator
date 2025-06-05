@@ -1,0 +1,29 @@
+{
+  "last_update": "2025-06-05T14:29:54Z",
+  "laws": {
+    "eu-aml-2024": {
+      "name": "EU-Geldwäscheverordnung 2024",
+      "celex": "32024R1624",
+      "file": "eu-aml-2024.html",
+      "size": 1235324
+    },
+    "eu-gdpr-2016": {
+      "name": "EU-Datenschutz-Grundverordnung",
+      "celex": "32016R0679", 
+      "file": "eu-gdpr-2016.html",
+      "size": 864775
+    },
+    "eu-ai-act-2024": {
+      "name": "EU-KI-Verordnung (AI Act)",
+      "celex": "32024R1689",
+      "file": "eu-ai-act-2024.html", 
+      "size": 1340236
+    },
+    "eu-dsa-2022": {
+      "name": "Digital Services Act",
+      "celex": "32022R2065",
+      "file": "eu-dsa-2022.html",
+      "size": 886423
+    }
+  }
+}
