@@ -1,4 +1,4 @@
-ng<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
@@ -326,6 +326,62 @@ ng<!DOCTYPE html>
             color: white;
         }
 
+        /* Deutsche Gesetze Badges */
+        .law-badge.de-gwg {
+            background: #B91C1C;
+            color: white;
+        }
+
+        .law-badge.de-kwg {
+            background: #1F2937;
+            color: white;
+        }
+
+        .law-badge.de-zag {
+            background: #7C3AED;
+            color: white;
+        }
+
+        .law-badge.de-awg {
+            background: #EA580C;
+            color: white;
+        }
+
+        .law-badge.de-awv {
+            background: #F59E0B;
+            color: white;
+        }
+
+        .law-badge.de-stgb {
+            background: #991B1B;
+            color: white;
+        }
+
+        .law-badge.de-vag {
+            background: #0891B2;
+            color: white;
+        }
+
+        .law-badge.de-kagb {
+            background: #059669;
+            color: white;
+        }
+
+        .law-badge.de-wphg {
+            background: #0D9488;
+            color: white;
+        }
+
+        .law-badge.de-sanktdg {
+            background: #DC2626;
+            color: white;
+        }
+
+        .law-badge.default {
+            background: #6B7280;
+            color: white;
+        }
+
         @media (max-width: 768px) {
             .euaml-container {
                 margin: 10px;
@@ -359,11 +415,29 @@ ng<!DOCTYPE html>
             </h1>
             <div class="euaml-controls">
                 <select class="euaml-law-selector" id="euamlLawSelector">
-                    <optgroup label="EU-Verordnungen">
+                    <optgroup label="🇪🇺 EU-Verordnungen">
                         <option value="eu_aml_2024">EU-Geldwäscheverordnung 2024</option>
                         <option value="eu_gdpr_2016">EU-Datenschutz-Grundverordnung (GDPR)</option>
                         <option value="eu_ai_act_2024">EU-KI-Verordnung (AI Act) 2024</option>
                         <option value="eu_dsa_2022">Digital Services Act 2022</option>
+                    </optgroup>
+                    <optgroup label="🏦 Deutsche Gesetze - Geldwäscheprävention">
+                        <option value="de_gwg_2017">Geldwäschegesetz (GwG)</option>
+                        <option value="de_kwg">Kreditwesengesetz (KWG)</option>
+                        <option value="de_zag_2018">Zahlungsdiensteaufsichtsgesetz (ZAG)</option>
+                        <option value="de_vag_2016">Versicherungsaufsichtsgesetz (VAG)</option>
+                    </optgroup>
+                    <optgroup label="🌍 Deutsche Gesetze - Sanktionen & Außenwirtschaft">
+                        <option value="de_awg">Außenwirtschaftsgesetz (AWG)</option>
+                        <option value="de_awv_2013">Außenwirtschaftsverordnung (AWV)</option>
+                        <option value="de_eu_sanktdg">EU-Sanktions-Durchführungsgesetz</option>
+                    </optgroup>
+                    <optgroup label="📈 Deutsche Gesetze - Kapitalmarkt & Investitionen">
+                        <option value="de_kagb">Kapitalanlagegesetzbuch (KAGB)</option>
+                        <option value="de_wphg">Wertpapierhandelsgesetz (WpHG)</option>
+                    </optgroup>
+                    <optgroup label="⚖️ Deutsche Gesetze - Strafrecht">
+                        <option value="de_stgb">Strafgesetzbuch (StGB) - §261 Geldwäsche</option>
                     </optgroup>
                 </select>
                 <button class="euaml-refresh-btn" id="euamlRefreshBtn">🔄 Neu laden</button>
@@ -398,13 +472,14 @@ ng<!DOCTYPE html>
             
             // Konfiguration - ANPASSEN AN IHR REPOSITORY!
             const GITHUB_CONFIG = {
-                username: 'obenning',  // ⚠️ HIER ANPASSEN
-                repository: 'eu-laws-navigator', // ⚠️ HIER ANPASSEN  
+                username: 'IHR-GITHUB-USERNAME',  // ⚠️ HIER ANPASSEN
+                repository: 'IHR-REPOSITORY-NAME', // ⚠️ HIER ANPASSEN  
                 branch: 'main'
             };
             
             // Konfiguration der verfügbaren Gesetze
             const AVAILABLE_LAWS = {
+                // EU-Verordnungen
                 'eu_aml_2024': {
                     name: 'EU-Geldwäscheverordnung 2024',
                     shortName: 'EU-GwVO',
@@ -435,6 +510,88 @@ ng<!DOCTYPE html>
                     filename: 'eu-dsa-2022.html',
                     celex: '32022R2065',
                     type: 'eu-regulation',
+                    color: '#DC2626'
+                },
+                
+                // Deutsche Gesetze - Geldwäscheprävention & Sanktionen
+                'de_gwg_2017': {
+                    name: 'Geldwäschegesetz (GwG)',
+                    shortName: 'GwG',
+                    filename: 'de-gwg-2017.html',
+                    type: 'german-law',
+                    category: 'aml',
+                    color: '#B91C1C'
+                },
+                'de_kwg': {
+                    name: 'Kreditwesengesetz (KWG)',
+                    shortName: 'KWG',
+                    filename: 'de-kwg.html',
+                    type: 'german-law',
+                    category: 'banking',
+                    color: '#1F2937'
+                },
+                'de_zag_2018': {
+                    name: 'Zahlungsdiensteaufsichtsgesetz (ZAG)',
+                    shortName: 'ZAG',
+                    filename: 'de-zag-2018.html',
+                    type: 'german-law',
+                    category: 'payments',
+                    color: '#7C3AED'
+                },
+                'de_awg': {
+                    name: 'Außenwirtschaftsgesetz (AWG)',
+                    shortName: 'AWG',
+                    filename: 'de-awg.html',
+                    type: 'german-law',
+                    category: 'sanctions',
+                    color: '#EA580C'
+                },
+                'de_awv_2013': {
+                    name: 'Außenwirtschaftsverordnung (AWV)',
+                    shortName: 'AWV',
+                    filename: 'de-awv-2013.html',
+                    type: 'german-law',
+                    category: 'sanctions',
+                    color: '#F59E0B'
+                },
+                'de_stgb': {
+                    name: 'Strafgesetzbuch (StGB)',
+                    shortName: 'StGB',
+                    filename: 'de-stgb.html',
+                    type: 'german-law',
+                    category: 'criminal',
+                    color: '#991B1B'
+                },
+                'de_vag_2016': {
+                    name: 'Versicherungsaufsichtsgesetz (VAG)',
+                    shortName: 'VAG',
+                    filename: 'de-vag-2016.html',
+                    type: 'german-law',
+                    category: 'insurance',
+                    color: '#0891B2'
+                },
+                'de_kagb': {
+                    name: 'Kapitalanlagegesetzbuch (KAGB)',
+                    shortName: 'KAGB',
+                    filename: 'de-kagb.html',
+                    type: 'german-law',
+                    category: 'investments',
+                    color: '#059669'
+                },
+                'de_wphg': {
+                    name: 'Wertpapierhandelsgesetz (WpHG)',
+                    shortName: 'WpHG',
+                    filename: 'de-wphg.html',
+                    type: 'german-law',
+                    category: 'securities',
+                    color: '#0D9488'
+                },
+                'de_eu_sanktdg': {
+                    name: 'EU-Sanktions-Durchführungsgesetz',
+                    shortName: 'EU-SanktDG',
+                    filename: 'de-eu-sanktdg.html',
+                    type: 'german-law',
+                    category: 'sanctions',
                     color: '#DC2626'
                 }
             };
@@ -669,6 +826,17 @@ ng<!DOCTYPE html>
             }
             
             function parseArticleStructure(tempDiv, lawConfig) {
+                // Unterscheide zwischen EU-Verordnungen und deutschen Gesetzen
+                if (lawConfig.type === 'eu-regulation') {
+                    return parseEURegulationStructure(tempDiv, lawConfig);
+                } else if (lawConfig.type === 'german-law') {
+                    return parseGermanLawStructure(tempDiv, lawConfig);
+                }
+                
+                throw new Error('Unbekannter Gesetzestyp: ' + lawConfig.type);
+            }
+            
+            function parseEURegulationStructure(tempDiv, lawConfig) {
                 // Suche nach Artikel-Elementen
                 var selectors = [
                     '[id^="art_"]',
@@ -681,7 +849,7 @@ ng<!DOCTYPE html>
                 for (var s = 0; s < selectors.length; s++) {
                     var found = tempDiv.querySelectorAll(selectors[s]);
                     if (found.length > 0) {
-                        console.log(`Gefunden mit Selector "${selectors[s]}":`, found.length, 'Artikel');
+                        console.log(`EU-Regulation - Gefunden mit Selector "${selectors[s]}":`, found.length, 'Artikel');
                         articleElements = found;
                         break;
                     }
@@ -694,12 +862,315 @@ ng<!DOCTYPE html>
                 // Fallback: Links
                 var articleLinks = tempDiv.querySelectorAll('a[href^="#art"], a[href*="article"]');
                 if (articleLinks.length > 0) {
-                    console.log('Gefunden über Links:', articleLinks.length, 'Artikel');
+                    console.log('EU-Regulation - Gefunden über Links:', articleLinks.length, 'Artikel');
                     return createSectionsFromLinks(articleLinks, lawConfig);
                 }
                 
-                throw new Error('Keine Artikel gefunden');
+                throw new Error('Keine EU-Artikel gefunden');
             }
+            
+            function parseGermanLawStructure(tempDiv, lawConfig) {
+                console.log('Parse deutsche Gesetze-Struktur für:', lawConfig.shortName);
+                
+                // Deutsche Gesetze verwenden Paragraphen (§) statt Artikel
+                var selectors = [
+                    '[id^="para"]',           // §1, §2, etc.
+                    '[id^="P"]',              // P1, P2, etc.
+                    '[id*="paragraph"]',      // paragraph1, etc.
+                    'div.jurAbsatz',          // Typische Struktur von gesetze-im-internet.de
+                    '.norm'                   // Norm-Container
+                ];
+                
+                var paragraphElements = [];
+                for (var s = 0; s < selectors.length; s++) {
+                    var found = tempDiv.querySelectorAll(selectors[s]);
+                    if (found.length > 0) {
+                        console.log(`Deutsche Gesetze - Gefunden mit Selector "${selectors[s]}":`, found.length, 'Paragraphen');
+                        paragraphElements = found;
+                        break;
+                    }
+                }
+                
+                // Fallback: Suche nach Links zu Paragraphen
+                if (paragraphElements.length === 0) {
+                    var paragraphLinks = tempDiv.querySelectorAll('a[href*="para"], a[href*="P"], a[href*="BJNR"]');
+                    console.log('Deutsche Gesetze - Links gefunden:', paragraphLinks.length);
+                    
+                    if (paragraphLinks.length > 0) {
+                        return createGermanSectionsFromLinks(paragraphLinks, lawConfig);
+                    }
+                }
+                
+                if (paragraphElements.length > 0) {
+                    return createGermanSectionsFromElements(paragraphElements, lawConfig);
+                }
+                
+                throw new Error('Keine deutschen Paragraphen gefunden');
+            }
+            
+            function createGermanSectionsFromElements(elements, lawConfig) {
+                var allParagraphs = [];
+                var processedIds = new Set();
+                
+                for (var i = 0; i < elements.length; i++) {
+                    var element = elements[i];
+                    
+                    if (processedIds.has(element.id)) continue;
+                    processedIds.add(element.id);
+                    
+                    // Verschiedene Muster für deutsche Paragraph-IDs
+                    var patterns = [
+                        /para(\d+)/i,           // para1, para2
+                        /P(\d+)/,               // P1, P2
+                        /paragraph(\d+)/i,      // paragraph1
+                        /(\d+)/                 // Fallback: nur Zahlen
+                    ];
+                    
+                    var paragraphNum = null;
+                    for (var p = 0; p < patterns.length; p++) {
+                        var match = element.id.match(patterns[p]);
+                        if (match) {
+                            paragraphNum = parseInt(match[1], 10);
+                            if (paragraphNum > 0 && paragraphNum < 10000) {
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (paragraphNum) {
+                        var title = extractGermanTitle(element, paragraphNum);
+                        
+                        allParagraphs.push({
+                            number: paragraphNum,
+                            title: title,
+                            id: element.id,
+                            isParagraph: true  // Kennzeichnung für deutsche Paragraphen
+                        });
+                        
+                        console.log(`§ ${paragraphNum}: ${title}`);
+                    }
+                }
+                
+                allParagraphs.sort(function(a, b) { return a.number - b.number; });
+                return groupGermanParagraphs(allParagraphs, lawConfig);
+            }
+            
+            function createGermanSectionsFromLinks(paragraphLinks, lawConfig) {
+                var allParagraphs = [];
+                var processedNumbers = new Set();
+                
+                for (var i = 0; i < paragraphLinks.length; i++) {
+                    var link = paragraphLinks[i];
+                    var href = link.getAttribute('href') || '';
+                    var text = link.textContent || '';
+                    
+                    // Extrahiere Paragraph-Nummer aus Link
+                    var patterns = [
+                        /§\s*(\d+)/,           // § 1, §2
+                        /para(\d+)/i,          // para1
+                        /P(\d+)/,              // P1
+                        /(\d+)/                // Fallback
+                    ];
+                    
+                    var paragraphNum = null;
+                    for (var p = 0; p < patterns.length; p++) {
+                        var match = (href + ' ' + text).match(patterns[p]);
+                        if (match) {
+                            paragraphNum = parseInt(match[1], 10);
+                            if (paragraphNum > 0 && paragraphNum < 10000 && !processedNumbers.has(paragraphNum)) {
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (paragraphNum && !processedNumbers.has(paragraphNum)) {
+                        processedNumbers.add(paragraphNum);
+                        var title = extractGermanTitle(link, paragraphNum);
+                        
+                        allParagraphs.push({
+                            number: paragraphNum,
+                            title: title,
+                            id: 'para_' + paragraphNum,
+                            isParagraph: true
+                        });
+                    }
+                }
+                
+                allParagraphs.sort(function(a, b) { return a.number - b.number; });
+                return groupGermanParagraphs(allParagraphs, lawConfig);
+            }
+            
+            function extractGermanTitle(element, paragraphNum) {
+                // Deutsche Gesetzestitel extrahieren
+                var selectors = [
+                    '.titel',               // Typisch für gesetze-im-internet.de
+                    '.überschrift',
+                    '.heading',
+                    'h1', 'h2', 'h3', 'h4',
+                    'strong:first-child',
+                    'b:first-child'
+                ];
+                
+                for (var s = 0; s < selectors.length; s++) {
+                    var titleEl = element.querySelector ? element.querySelector(selectors[s]) : null;
+                    if (!titleEl && element.textContent) {
+                        var text = element.textContent.trim();
+                        if (text.length > 3 && text.length < 200) {
+                            return text.replace(/^§\s*\d+\s*[-–]?\s*/i, '');
+                        }
+                    }
+                    
+                    if (titleEl) {
+                        var text = titleEl.textContent.trim();
+                        if (text.length > 2 && text.length < 200) {
+                            return text.replace(/^§\s*\d+\s*[-–]?\s*/i, '');
+                        }
+                    }
+                }
+                
+                return '§ ' + paragraphNum;
+            }
+            
+            function groupGermanParagraphs(allParagraphs, lawConfig) {
+                // Gesetzspezifische Gruppierung für deutsche Gesetze
+                switch (lawConfig.shortName) {
+                    case 'GwG':
+                        return groupGwGParagraphs(allParagraphs);
+                    case 'KWG':
+                        return groupKWGParagraphs(allParagraphs);
+                    case 'ZAG':
+                        return groupZAGParagraphs(allParagraphs);
+                    case 'AWG':
+                        return groupAWGParagraphs(allParagraphs);
+                    case 'AWV':
+                        return groupAWVParagraphs(allParagraphs);
+                    case 'StGB':
+                        return groupStGBParagraphs(allParagraphs);
+                    case 'VAG':
+                        return groupVAGParagraphs(allParagraphs);
+                    case 'KAGB':
+                        return groupKAGBParagraphs(allParagraphs);
+                    case 'WpHG':
+                        return groupWpHGParagraphs(allParagraphs);
+                    case 'EU-SanktDG':
+                        return groupEUSanktDGParagraphs(allParagraphs);
+                    default:
+                        return groupGenericGermanParagraphs(allParagraphs);
+                }
+            }
+            
+            function groupGwGParagraphs(allParagraphs) {
+                var sections = [
+                    { title: "Allgemeine Bestimmungen", start: 1, end: 3 },
+                    { title: "Sorgfaltspflichten", start: 4, end: 11 },
+                    { title: "Organisationspflichten", start: 12, end: 25 },
+                    { title: "Meldepflichten", start: 26, end: 45 },
+                    { title: "Aufsicht", start: 46, end: 55 },
+                    { title: "Bußgeld- und Strafvorschriften", start: 56, end: 65 }
+                ];
+                
+                return createGermanSectionsFromRanges(sections, allParagraphs);
+            }
+            
+            function groupKWGParagraphs(allParagraphs) {
+                var sections = [
+                    { title: "Allgemeine Bestimmungen", start: 1, end: 11 },
+                    { title: "Bankgeschäfte", start: 12, end: 25 },
+                    { title: "Aufsicht über Institute", start: 26, end: 45 },
+                    { title: "Eigenmittel und Liquidität", start: 46, end: 65 },
+                    { title: "Sanktionen", start: 66, end: 75 }
+                ];
+                
+                return createGermanSectionsFromRanges(sections, allParagraphs);
+            }
+            
+            function groupZAGParagraphs(allParagraphs) {
+                var sections = [
+                    { title: "Allgemeine Bestimmungen", start: 1, end: 5 },
+                    { title: "Erlaubnis", start: 6, end: 15 },
+                    { title: "Aufsicht", start: 16, end: 25 },
+                    { title: "Sonstige Bestimmungen", start: 26, end: 35 }
+                ];
+                
+                return createGermanSectionsFromRanges(sections, allParagraphs);
+            }
+            
+            function groupAWGParagraphs(allParagraphs) {
+                var sections = [
+                    { title: "Grundlagen", start: 1, end: 5 },
+                    { title: "Beschränkungen", start: 6, end: 15 },
+                    { title: "Durchführung", start: 16, end: 25 },
+                    { title: "Sanktionen", start: 26, end: 35 }
+                ];
+                
+                return createGermanSectionsFromRanges(sections, allParagraphs);
+            }
+            
+            function groupStGBParagraphs(allParagraphs) {
+                // Fokus auf Geldwäsche-relevante Paragraphen
+                var sections = [
+                    { title: "Geldwäsche und Terrorismusfinanzierung", start: 260, end: 265 },
+                    { title: "Weitere relevante Straftaten", start: 266, end: 280 }
+                ];
+                
+                return createGermanSectionsFromRanges(sections, allParagraphs);
+            }
+            
+            function groupGenericGermanParagraphs(allParagraphs) {
+                // Generische Gruppierung für unbekannte deutsche Gesetze
+                var sectionsSize = 20; // Gruppiere in 20er-Blöcke
+                var sections = [];
+                var currentSection = 1;
+                
+                for (var i = 0; i < allParagraphs.length; i += sectionsSize) {
+                    var sectionParagraphs = allParagraphs.slice(i, i + sectionsSize);
+                    if (sectionParagraphs.length > 0) {
+                        var startNum = sectionParagraphs[0].number;
+                        var endNum = sectionParagraphs[sectionParagraphs.length - 1].number;
+                        
+                        sections.push({
+                            number: currentSection++,
+                            title: `§§ ${startNum}-${endNum}`,
+                            articles: sectionParagraphs
+                        });
+                    }
+                }
+                
+                return sections;
+            }
+            
+            function createGermanSectionsFromRanges(ranges, allParagraphs) {
+                var result = [];
+                
+                for (var i = 0; i < ranges.length; i++) {
+                    var range = ranges[i];
+                    var sectionParagraphs = [];
+                    
+                    for (var j = 0; j < allParagraphs.length; j++) {
+                        var paragraph = allParagraphs[j];
+                        if (paragraph.number >= range.start && paragraph.number <= range.end) {
+                            sectionParagraphs.push(paragraph);
+                        }
+                    }
+                    
+                    if (sectionParagraphs.length > 0) {
+                        result.push({
+                            number: i + 1,
+                            title: range.title,
+                            articles: sectionParagraphs  // Verwende "articles" für Kompatibilität
+                        });
+                    }
+                }
+                
+                return result;
+            }
+            
+            // Restliche Gruppierungsfunktionen - minimale Implementierung
+            function groupAWVParagraphs(allParagraphs) { return groupGenericGermanParagraphs(allParagraphs); }
+            function groupVAGParagraphs(allParagraphs) { return groupGenericGermanParagraphs(allParagraphs); }
+            function groupKAGBParagraphs(allParagraphs) { return groupGenericGermanParagraphs(allParagraphs); }
+            function groupWpHGParagraphs(allParagraphs) { return groupGenericGermanParagraphs(allParagraphs); }
+            function groupEUSanktDGParagraphs(allParagraphs) { return groupGenericGermanParagraphs(allParagraphs); }
             
             function createSectionsFromElements(elements, lawConfig) {
                 var allArticles = [];
@@ -880,12 +1351,24 @@ ng<!DOCTYPE html>
             }
             
             function extractArticleContents(tempDiv, lawConfig) {
-                var selectors = [
-                    '[id^="art_"]',
-                    '[id^="article_"]', 
-                    '[id^="Art"]',
-                    '[id*="article"]'
-                ];
+                var selectors;
+                
+                if (lawConfig.type === 'eu-regulation') {
+                    selectors = [
+                        '[id^="art_"]',
+                        '[id^="article_"]', 
+                        '[id^="Art"]',
+                        '[id*="article"]'
+                    ];
+                } else if (lawConfig.type === 'german-law') {
+                    selectors = [
+                        '[id^="para"]',
+                        '[id^="P"]',
+                        '[id*="paragraph"]',
+                        'div.jurAbsatz',
+                        '.norm'
+                    ];
+                }
                 
                 var articleElements = [];
                 for (var s = 0; s < selectors.length; s++) {
@@ -896,7 +1379,7 @@ ng<!DOCTYPE html>
                     }
                 }
                 
-                console.log('Extrahiere Inhalte für', articleElements.length, 'Artikel');
+                console.log('Extrahiere Inhalte für', articleElements.length, lawConfig.type === 'german-law' ? 'Paragraphen' : 'Artikel');
 
                 for (var i = 0; i < articleElements.length; i++) {
                     var article = articleElements[i];
@@ -908,15 +1391,24 @@ ng<!DOCTYPE html>
                         unwanted[u].remove();
                     }
 
-                    var firstTitle = content.querySelector('.oj-sti-art, .eli-title, .title, h1, h2, h3');
-                    if (firstTitle && firstTitle.textContent.trim().length < 120) {
-                        firstTitle.remove();
+                    // Entferne redundante Titel
+                    var titleSelectors = ['.oj-sti-art', '.eli-title', '.title', 'h1', 'h2', 'h3', '.titel', '.überschrift'];
+                    for (var t = 0; t < titleSelectors.length; t++) {
+                        var firstTitle = content.querySelector(titleSelectors[t]);
+                        if (firstTitle && firstTitle.textContent.trim().length < 120) {
+                            firstTitle.remove();
+                            break;
+                        }
                     }
 
-                    if (lawConfig.shortName === 'GDPR') {
-                        formatGDPRContent(content);
-                    } else {
-                        formatEUContent(content);
+                    if (lawConfig.type === 'eu-regulation') {
+                        if (lawConfig.shortName === 'GDPR') {
+                            formatGDPRContent(content);
+                        } else {
+                            formatEUContent(content);
+                        }
+                    } else if (lawConfig.type === 'german-law') {
+                        formatGermanContent(content);
                     }
 
                     var cleanContent = content.innerHTML.trim();
@@ -948,6 +1440,7 @@ ng<!DOCTYPE html>
             }
             
             function formatEUContent(contentDiv) {
+                // EU-Verordnungen Formatierung
                 var tables = contentDiv.querySelectorAll('table');
                 
                 for (var i = 0; i < tables.length; i++) {
@@ -1000,6 +1493,81 @@ ng<!DOCTYPE html>
                 for (var t = 0; t < articleTitles.length; t++) {
                     var titleP = articleTitles[t];
                     titleP.style.cssText = 'font-weight: 600; color: #063AA8; margin: 1em 0 0.5em 0; font-size: 1.1em;';
+                }
+            }
+            
+            function formatGermanContent(contentDiv) {
+                // Deutsche Gesetze-spezifische Formatierung
+                console.log('Formatiere deutschen Gesetzesinhalt');
+                
+                // Formatiere Absätze mit Nummern
+                var paragraphs = contentDiv.querySelectorAll('p, .absatz, .jurAbsatz');
+                for (var p = 0; p < paragraphs.length; p++) {
+                    var para = paragraphs[p];
+                    var text = para.textContent.trim();
+                    
+                    // Deutsche Absätze: (1), (2), etc.
+                    var match = text.match(/^\((\d+)\)\s+(.+)$/);
+                    if (match) {
+                        var absatzNum = match[1];
+                        var absatzText = match[2];
+                        
+                        para.innerHTML = 
+                            '<div style="margin: 0.5em 0; padding-left: 1.5em; position: relative;">' +
+                            '<span style="position: absolute; left: 0; font-weight: 500; color: #B91C1C;">(' + absatzNum + ')</span>' +
+                            absatzText +
+                            '</div>';
+                    }
+                    
+                    // Nummern: 1., 2., etc.
+                    var numberMatch = text.match(/^(\d+)\.\s+(.+)$/);
+                    if (numberMatch) {
+                        var num = numberMatch[1];
+                        var numText = numberMatch[2];
+                        
+                        para.innerHTML = 
+                            '<div style="margin: 0.5em 0; padding-left: 1.5em; position: relative;">' +
+                            '<span style="position: absolute; left: 0; font-weight: 500; color: #B91C1C;">' + num + '.</span>' +
+                            numText +
+                            '</div>';
+                    }
+                }
+                
+                // Formatiere Paragraph-Titel
+                var titles = contentDiv.querySelectorAll('.titel, .überschrift, h1, h2, h3, h4');
+                for (var t = 0; t < titles.length; t++) {
+                    var title = titles[t];
+                    title.style.cssText = 'font-weight: 600; color: #B91C1C; margin: 1em 0 0.5em 0; font-size: 1.1em;';
+                }
+                
+                // Formatiere Listen
+                var lists = contentDiv.querySelectorAll('ol, ul');
+                for (var l = 0; l < lists.length; l++) {
+                    var list = lists[l];
+                    list.style.cssText = 'margin: 0.5em 0; padding-left: 2em;';
+                    
+                    var listItems = list.querySelectorAll('li');
+                    for (var li = 0; li < listItems.length; li++) {
+                        var item = listItems[li];
+                        item.style.cssText = 'margin: 0.3em 0;';
+                    }
+                }
+                
+                // Formatiere Tabellen
+                var tables = contentDiv.querySelectorAll('table');
+                for (var i = 0; i < tables.length; i++) {
+                    var table = tables[i];
+                    table.style.cssText = 'border-collapse: collapse; width: 100%; margin: 1em 0;';
+                    
+                    var rows = table.querySelectorAll('tr');
+                    for (var j = 0; j < rows.length; j++) {
+                        var row = rows[j];
+                        var cells = row.querySelectorAll('td, th');
+                        for (var c = 0; c < cells.length; c++) {
+                            var cell = cells[c];
+                            cell.style.cssText = 'border: 1px solid #ddd; padding: 8px; text-align: left;';
+                        }
+                    }
                 }
             }
             
@@ -1076,9 +1644,62 @@ ng<!DOCTYPE html>
                 console.log('Sections gerendert mit Filter:', filter);
             }
             
+            function getBadgeClass(shortName) {
+                var badgeClasses = {
+                    // EU-Verordnungen
+                    'EU-GwVO': 'eu-aml',
+                    'GDPR': 'gdpr', 
+                    'AI Act': 'ai-act',
+                    'DSA': 'dsa',
+                    
+                    // Deutsche Gesetze
+                    'GwG': 'de-gwg',
+                    'KWG': 'de-kwg',
+                    'ZAG': 'de-zag',
+                    'AWG': 'de-awg',
+                    'AWV': 'de-awv',
+                    'StGB': 'de-stgb',
+                    'VAG': 'de-vag',
+                    'KAGB': 'de-kagb',
+                    'WpHG': 'de-wphg',
+                    'EU-SanktDG': 'de-sanktdg'
+                };
+                
+                return badgeClasses[shortName] || 'default';
+            }
+            
+            function getSourceUrl(lawConfig, article) {
+                if (lawConfig.type === 'eu-regulation' && lawConfig.celex) {
+                    var articleRef = article.isParagraph ? 'para_' + article.number : 'art_' + article.number;
+                    return 'https://eur-lex.europa.eu/legal-content/DE/TXT/?uri=CELEX:' + lawConfig.celex + '#' + articleRef;
+                } else if (lawConfig.type === 'german-law') {
+                    // Deutsche Gesetze - Link zu gesetze-im-internet.de
+                    var lawMappings = {
+                        'GwG': 'gwg_2017',
+                        'KWG': 'kwg',
+                        'ZAG': 'zag_2018',
+                        'AWG': 'awg',
+                        'AWV': 'awv_2013',
+                        'StGB': 'stgb',
+                        'VAG': 'vag_2016',
+                        'KAGB': 'kagb',
+                        'WpHG': 'wphg',
+                        'EU-SanktDG': 'eusanktdg'
+                    };
+                    
+                    var lawPath = lawMappings[lawConfig.shortName];
+                    if (lawPath) {
+                        return 'https://www.gesetze-im-internet.de/' + lawPath + '/';
+                    }
+                }
+                
+                return '#'; // Fallback
+            }
+            
             function highlightText(text, searchTerm) {
                 if (!searchTerm || searchTerm.length < 1) return text;
-                var escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                var escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\                return '#'; // Fallback
+            }');
                 var regex = new RegExp('(' + escapedTerm + ')', 'gi');
                 return text.replace(regex, '<span class="euaml-search-highlight">$1</span>');
             }
