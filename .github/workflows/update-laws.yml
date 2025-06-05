@@ -25,8 +25,25 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         
-    - name: 📁 Laws-Ordner erstellen
-      run: mkdir -p laws
+    - name: 📁 Laws-Ordner vorbereiten
+      run: |
+        # Entferne existing laws falls es eine Datei ist
+        if [ -f laws ]; then
+          echo "⚠️ 'laws' ist eine Datei - wird gelöscht"
+          rm laws
+        fi
+        
+        # Erstelle laws Ordner falls er nicht existiert
+        if [ ! -d laws ]; then
+          echo "📁 Erstelle laws Ordner"
+          mkdir laws
+        else
+          echo "✅ laws Ordner existiert bereits"
+        fi
+        
+        # Bereinige alte Dateien (optional)
+        echo "🧹 Bereinige laws Ordner"
+        rm -f laws/*.html
       
     - name: 🏛️ EU-Geldwäscheverordnung 2024 herunterladen
       run: |
