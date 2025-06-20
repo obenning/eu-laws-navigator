@@ -155,72 +155,89 @@ jobs:
       run: |
         echo "📊 Erstelle Metadaten..."
         
-        # Zähle verfügbare Gesetze
+        # Zähle verfügbare Gesetze mit Debug-Output
         eu_count=0
         de_count=0
         
-        # Prüfe EU-Gesetze (echte Downloads haben > 10000 Bytes)
+        echo "🔍 Prüfe EU-Gesetze..."
         for eu_file in eu-aml-2024.html eu-gdpr-2016.html eu-ai-act-2024.html eu-dsa-2022.html; do
-          if [ -f "laws/$eu_file" ] && [ $(wc -c < "laws/$eu_file") -gt 10000 ]; then
-            ((eu_count++))
+          if [ -f "laws/$eu_file" ]; then
+            size=$(wc -c < "laws/$eu_file")
+            echo "  $eu_file: $size Bytes"
+            if [ $size -gt 10000 ]; then
+              ((eu_count++))
+              echo "    ✅ Gezählt als verfügbar"
+            else
+              echo "    📄 Zu klein - nicht gezählt"
+            fi
+          else
+            echo "  ❌ $eu_file: Datei nicht gefunden"
           fi
         done
         
-        # Prüfe deutsche Gesetze (alle erstellt)
+        echo "🔍 Prüfe deutsche Gesetze..."
         for de_file in de-gwg-2017.html de-kwg.html de-zag-2018.html de-awg.html de-awv-2013.html de-stgb.html de-vag-2016.html de-kagb.html de-wphg.html de-eu-sanktdg.html; do
           if [ -f "laws/$de_file" ]; then
+            size=$(wc -c < "laws/$de_file")
+            echo "  $de_file: $size Bytes"
             ((de_count++))
+          else
+            echo "  ❌ $de_file: Datei nicht gefunden"
           fi
         done
         
-        # Erstelle JSON-Metadaten
+        echo "📊 Statistiken: EU=$eu_count/4, DE=$de_count/10"
+        
+        # Sichere JSON-Erstellung mit printf
         timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
         eu_rate=$(( eu_count * 100 / 4 ))
         de_rate=$(( de_count * 100 / 10 ))
         
-        # JSON erstellen ohne YAML-Konflikte
-        {
-          echo '{'
-          echo "  \"last_update\": \"$timestamp\","
-          echo '  "success_strategy": "YAML-sichere Fallbacks mit direkten Links",'
-          echo '  "statistics": {'
-          echo '    "eu_laws": {'
-          echo "      \"available\": $eu_count,"
-          echo '      "total": 4,'
-          echo "      \"success_rate\": \"$eu_rate%\""
-          echo '    },'
-          echo '    "german_laws": {'
-          echo "      \"available\": $de_count,"
-          echo '      "total": 10,'
-          echo "      \"success_rate\": \"$de_rate%\""
-          echo '    }'
-          echo '  },'
-          echo '  "laws": {'
-          echo '    "eu-aml-2024": {'
-          echo '      "name": "EU-Geldwäscheverordnung 2024",'
-          echo '      "file": "eu-aml-2024.html",'
-          echo '      "type": "eu-regulation"'
-          echo '    },'
-          echo '    "eu-gdpr-2016": {'
-          echo '      "name": "EU-Datenschutz-Grundverordnung",'
-          echo '      "file": "eu-gdpr-2016.html",'
-          echo '      "type": "eu-regulation"'
-          echo '    },'
-          echo '    "eu-ai-act-2024": {'
-          echo '      "name": "EU-KI-Verordnung (AI Act)",'
-          echo '      "file": "eu-ai-act-2024.html",'
-          echo '      "type": "eu-regulation"'
-          echo '    },'
-          echo '    "eu-dsa-2022": {'
-          echo '      "name": "Digital Services Act",'
-          echo '      "file": "eu-dsa-2022.html",'
-          echo '      "type": "eu-regulation"'
-          echo '    }'
-          echo '  }'
-          echo '}'
-        } > laws/last-update.json
+        # JSON sicher erstellen
+        cat > laws/last-update.json << JSONEND
+{
+  "last_update": "$timestamp",
+  "success_strategy": "Robuste Fallbacks mit direkten Links",
+  "statistics": {
+    "eu_laws": {
+      "available": $eu_count,
+      "total": 4,
+      "success_rate": "${eu_rate}%"
+    },
+    "german_laws": {
+      "available": $de_count,
+      "total": 10,
+      "success_rate": "${de_rate}%"
+    }
+  },
+  "laws": {
+    "eu-aml-2024": {
+      "name": "EU-Geldwaescheverordnung 2024",
+      "file": "eu-aml-2024.html",
+      "type": "eu-regulation"
+    },
+    "eu-gdpr-2016": {
+      "name": "EU-Datenschutz-Grundverordnung",
+      "file": "eu-gdpr-2016.html",
+      "type": "eu-regulation"
+    },
+    "eu-ai-act-2024": {
+      "name": "EU-KI-Verordnung (AI Act)",
+      "file": "eu-ai-act-2024.html",
+      "type": "eu-regulation"
+    },
+    "eu-dsa-2022": {
+      "name": "Digital Services Act",
+      "file": "eu-dsa-2022.html",
+      "type": "eu-regulation"
+    }
+  }
+}
+JSONEND
         
         echo "✅ Metadaten erstellt"
+        echo "📄 JSON-Inhalt:"
+        cat laws/last-update.json
 
     # ===== COMMIT UND PUSH =====
     - name: 🔍 Änderungen prüfen
