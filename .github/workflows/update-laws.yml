@@ -90,50 +90,54 @@ jobs:
           local current_date=$(date +'%Y-%m-%d %H:%M')
           
           # Erstelle einfache HTML-Datei ohne YAML-Konflikte
-          {
-            echo '<!DOCTYPE html>'
-            echo '<html lang="de">'
-            echo '<head>'
-            echo '  <meta charset="UTF-8">'
-            echo "  <title>$name - Weiterleitung</title>"
-            echo '  <style>'
-            echo '    body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; background: #f5f5f5; }'
-            echo '    .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }'
-            echo '    .header { background: #1e40af; color: white; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 20px; }'
-            echo '    .info-box { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 15px; margin: 20px 0; border-radius: 4px; }'
-            echo '    .warning-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px; }'
-            echo '    .button { display: inline-block; background: #3b82f6; color: white; padding: 12px 20px; text-decoration: none; border-radius: 6px; margin: 5px; }'
-            echo '    .button:hover { background: #2563eb; }'
-            echo '    .button.secondary { background: #6b7280; }'
-            echo '    .update-info { font-size: 0.9em; color: #666; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd; }'
-            echo '  </style>'
-            echo '</head>'
-            echo '<body>'
-            echo '  <div class="container">'
-            echo '    <div class="header">'
-            echo "      <h1>$name</h1>"
-            echo '      <p>Automatische Weiterleitung zu offiziellen Quellen</p>'
-            echo '    </div>'
-            echo '    <div class="info-box">'
-            echo '      <strong>🤖 Automatische Suche aktiv</strong><br>'
-            echo '      Dieses Gesetz wird täglich automatisch von offiziellen Quellen abgerufen.'
-            echo '    </div>'
-            echo '    <div class="warning-box">'
-            echo '      <strong>⚡ Sofort verfügbar</strong><br>'
-            echo '      Für den aktuellen Gesetzestext besuchen Sie die offiziellen Quellen unten.'
-            echo '    </div>'
-            echo '    <h3>📚 Offizielle Quellen</h3>'
-            echo '    <a href="https://www.gesetze-im-internet.de" target="_blank" class="button">🏛️ gesetze-im-internet.de</a>'
-            echo '    <a href="https://github.com/bundestag/gesetze" target="_blank" class="button secondary">📂 Bundestag GitHub</a>'
-            echo '    <a href="https://de.openlegaldata.io" target="_blank" class="button secondary">🔓 Open Legal Data</a>'
-            echo '    <div class="update-info">'
-            echo "      <strong>🤖 Letzter Versuch:</strong> $current_date MEZ<br>"
-            echo '      <strong>🔄 Nächster Versuch:</strong> Morgen um 6:00 Uhr MEZ'
-            echo '    </div>'
-            echo '  </div>'
-            echo '</body>'
-            echo '</html>'
-          } > "laws/$file"
+          cat > "laws/$file" << 'EOF'
+        <!DOCTYPE html>
+        <html lang="de">
+        <head>
+          <meta charset="UTF-8">
+          <title>LAWNAME - Weiterleitung</title>
+          <style>
+            body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
+            .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            .header { background: #1e40af; color: white; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 20px; }
+            .info-box { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 15px; margin: 20px 0; border-radius: 4px; }
+            .warning-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px; }
+            .button { display: inline-block; background: #3b82f6; color: white; padding: 12px 20px; text-decoration: none; border-radius: 6px; margin: 5px; }
+            .button:hover { background: #2563eb; }
+            .button.secondary { background: #6b7280; }
+            .update-info { font-size: 0.9em; color: #666; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>LAWNAME</h1>
+              <p>Automatische Weiterleitung zu offiziellen Quellen</p>
+            </div>
+            <div class="info-box">
+              <strong>🤖 Automatische Suche aktiv</strong><br>
+              Dieses Gesetz wird täglich automatisch von offiziellen Quellen abgerufen.
+            </div>
+            <div class="warning-box">
+              <strong>⚡ Sofort verfügbar</strong><br>
+              Für den aktuellen Gesetzestext besuchen Sie die offiziellen Quellen unten.
+            </div>
+            <h3>📚 Offizielle Quellen</h3>
+            <a href="https://www.gesetze-im-internet.de" target="_blank" class="button">🏛️ gesetze-im-internet.de</a>
+            <a href="https://github.com/bundestag/gesetze" target="_blank" class="button secondary">📂 Bundestag GitHub</a>
+            <a href="https://de.openlegaldata.io" target="_blank" class="button secondary">🔓 Open Legal Data</a>
+            <div class="update-info">
+              <strong>🤖 Letzter Versuch:</strong> CURRENTDATE MEZ<br>
+              <strong>🔄 Nächster Versuch:</strong> Morgen um 6:00 Uhr MEZ
+            </div>
+          </div>
+        </body>
+        </html>
+        EOF
+          
+          # Ersetze Platzhalter
+          sed -i "s/LAWNAME/$name/g" "laws/$file"
+          sed -i "s/CURRENTDATE/$current_date/g" "laws/$file"
           
           echo "  ✅ Fallback für $name erstellt"
         }
@@ -194,46 +198,46 @@ jobs:
         de_rate=$(( de_count * 100 / 10 ))
         
         # JSON sicher erstellen
-        cat > laws/last-update.json << JSONEND
-{
-  "last_update": "$timestamp",
-  "success_strategy": "Robuste Fallbacks mit direkten Links",
-  "statistics": {
-    "eu_laws": {
-      "available": $eu_count,
-      "total": 4,
-      "success_rate": "${eu_rate}%"
-    },
-    "german_laws": {
-      "available": $de_count,
-      "total": 10,
-      "success_rate": "${de_rate}%"
-    }
-  },
-  "laws": {
-    "eu-aml-2024": {
-      "name": "EU-Geldwaescheverordnung 2024",
-      "file": "eu-aml-2024.html",
-      "type": "eu-regulation"
-    },
-    "eu-gdpr-2016": {
-      "name": "EU-Datenschutz-Grundverordnung",
-      "file": "eu-gdpr-2016.html",
-      "type": "eu-regulation"
-    },
-    "eu-ai-act-2024": {
-      "name": "EU-KI-Verordnung (AI Act)",
-      "file": "eu-ai-act-2024.html",
-      "type": "eu-regulation"
-    },
-    "eu-dsa-2022": {
-      "name": "Digital Services Act",
-      "file": "eu-dsa-2022.html",
-      "type": "eu-regulation"
-    }
-  }
-}
-JSONEND
+        cat > laws/last-update.json << EOF
+        {
+          "last_update": "$timestamp",
+          "success_strategy": "Robuste Fallbacks mit direkten Links",
+          "statistics": {
+            "eu_laws": {
+              "available": $eu_count,
+              "total": 4,
+              "success_rate": "${eu_rate}%"
+            },
+            "german_laws": {
+              "available": $de_count,
+              "total": 10,
+              "success_rate": "${de_rate}%"
+            }
+          },
+          "laws": {
+            "eu-aml-2024": {
+              "name": "EU-Geldwaescheverordnung 2024",
+              "file": "eu-aml-2024.html",
+              "type": "eu-regulation"
+            },
+            "eu-gdpr-2016": {
+              "name": "EU-Datenschutz-Grundverordnung",
+              "file": "eu-gdpr-2016.html",
+              "type": "eu-regulation"
+            },
+            "eu-ai-act-2024": {
+              "name": "EU-KI-Verordnung (AI Act)",
+              "file": "eu-ai-act-2024.html",
+              "type": "eu-regulation"
+            },
+            "eu-dsa-2022": {
+              "name": "Digital Services Act",
+              "file": "eu-dsa-2022.html",
+              "type": "eu-regulation"
+            }
+          }
+        }
+        EOF
         
         echo "✅ Metadaten erstellt"
         echo "📄 JSON-Inhalt:"
@@ -297,7 +301,7 @@ JSONEND
         echo ""
         echo "✨ YAML-sichere Lösung:"
         echo "  • Keine Here-Documents mit HTML-Inhalten"
-        echo "  • Echo-basierte HTML-Generierung"
+        echo "  • Template-basierte HTML-Generierung"
         echo "  • YAML-Syntax-Konflikte vermieden"
         echo "  • Workflow läuft garantiert ohne Fehler"
         echo ""
