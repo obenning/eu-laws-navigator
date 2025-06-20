@@ -159,18 +159,18 @@ jobs:
       run: |
         echo "📊 Erstelle Metadaten..."
         
-        # Zähle verfügbare Gesetze mit Debug-Output
+        # Explizite Initialisierung der Zähler
         eu_count=0
         de_count=0
         
         echo "🔍 Prüfe EU-Gesetze..."
         for eu_file in eu-aml-2024.html eu-gdpr-2016.html eu-ai-act-2024.html eu-dsa-2022.html; do
           if [ -f "laws/$eu_file" ]; then
-            size=$(wc -c < "laws/$eu_file")
+            size=$(wc -c < "laws/$eu_file" 2>/dev/null || echo "0")
             echo "  $eu_file: $size Bytes"
-            if [ $size -gt 10000 ]; then
-              ((eu_count++))
-              echo "    ✅ Gezählt als verfügbar"
+            if [ "$size" -gt 10000 ] 2>/dev/null; then
+              eu_count=$((eu_count + 1))
+              echo "    ✅ Gezählt als verfügbar (Gesamt: $eu_count)"
             else
               echo "    📄 Zu klein - nicht gezählt"
             fi
@@ -182,20 +182,32 @@ jobs:
         echo "🔍 Prüfe deutsche Gesetze..."
         for de_file in de-gwg-2017.html de-kwg.html de-zag-2018.html de-awg.html de-awv-2013.html de-stgb.html de-vag-2016.html de-kagb.html de-wphg.html de-eu-sanktdg.html; do
           if [ -f "laws/$de_file" ]; then
-            size=$(wc -c < "laws/$de_file")
+            size=$(wc -c < "laws/$de_file" 2>/dev/null || echo "0")
             echo "  $de_file: $size Bytes"
-            ((de_count++))
+            de_count=$((de_count + 1))
+            echo "    ✅ Deutsche Gesetze gezählt (Gesamt: $de_count)"
           else
             echo "  ❌ $de_file: Datei nicht gefunden"
           fi
         done
         
-        echo "📊 Statistiken: EU=$eu_count/4, DE=$de_count/10"
+        echo "📊 Finale Statistiken: EU=$eu_count/4, DE=$de_count/10"
         
-        # Sichere JSON-Erstellung mit printf
+        # Sichere Berechnung der Prozentsätze
         timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-        eu_rate=$(( eu_count * 100 / 4 ))
-        de_rate=$(( de_count * 100 / 10 ))
+        if [ "$eu_count" -gt 0 ]; then
+          eu_rate=$((eu_count * 100 / 4))
+        else
+          eu_rate=0
+        fi
+        
+        if [ "$de_count" -gt 0 ]; then
+          de_rate=$((de_count * 100 / 10))
+        else
+          de_rate=0
+        fi
+        
+        echo "📊 Berechnete Raten: EU=$eu_rate%, DE=$de_rate%"
         
         # JSON sicher erstellen
         cat > laws/last-update.json << EOF
