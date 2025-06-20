@@ -83,47 +83,18 @@ jobs:
       run: |
         echo "📥 Deutsche Gesetze - Erstelle informative Weiterleitungen"
         
-        # Array der deutschen Gesetze
-        declare -a GERMAN_FILES=(
-          "de-gwg-2017.html"
-          "de-kwg.html" 
-          "de-zag-2018.html"
-          "de-awg.html"
-          "de-awv-2013.html"
-          "de-stgb.html"
-          "de-vag-2016.html"
-          "de-kagb.html"
-          "de-wphg.html"
-          "de-eu-sanktdg.html"
-        )
-        
-        declare -a GERMAN_NAMES=(
-          "Geldwäschegesetz (GwG)"
-          "Kreditwesengesetz (KWG)"
-          "Zahlungsdiensteaufsichtsgesetz (ZAG)"
-          "Außenwirtschaftsgesetz (AWG)"
-          "Außenwirtschaftsverordnung (AWV)"
-          "Strafgesetzbuch (StGB)"
-          "Versicherungsaufsichtsgesetz (VAG)"
-          "Kapitalanlagegesetzbuch (KAGB)"
-          "Wertpapierhandelsgesetz (WpHG)"
-          "EU-Sanktions-Durchführungsgesetz"
-        )
-        
-        # Erstelle Fallback-HTML für jedes deutsche Gesetz
-        for i in "${!GERMAN_FILES[@]}"; do
-          law_file="${GERMAN_FILES[$i]}"
-          law_name="${GERMAN_NAMES[$i]}"
+        # Funktion zum Erstellen von Fallback-HTML
+        create_fallback() {
+          local file="$1"
+          local name="$2"
+          local date_now=$(date +'%Y-%m-%d %H:%M')
           
-          echo "📄 Erstelle Fallback für $law_name..."
-          
-          # Erstelle HTML-Fallback-Datei
-          cat > "laws/$law_file" << 'HTMLEOF'
+          cat > "laws/$file" << 'EOF'
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>LAW_NAME_PLACEHOLDER - Informative Weiterleitung</title>
+  <title>GESETZ_NAME - Informative Weiterleitung</title>
   <style>
     .fallback-container { 
       max-width: 800px; 
@@ -201,7 +172,7 @@ jobs:
 <body>
   <div class="fallback-container">
     <div class="fallback-header">
-      <div class="fallback-title">LAW_NAME_PLACEHOLDER</div>
+      <div class="fallback-title">GESETZ_NAME</div>
       <div>Offizielle Quellen & automatische Weiterleitung</div>
     </div>
     
@@ -248,7 +219,7 @@ jobs:
         </a>
         
         <div class="update-info">
-          <strong>🤖 Letzter Versuch:</strong> DATE_PLACEHOLDER MEZ<br>
+          <strong>🤖 Letzter Versuch:</strong> DATUM_PLACEHOLDER MEZ<br>
           <strong>🔄 Nächster Versuch:</strong> Morgen um 6:00 Uhr MEZ<br>
           <strong>⚙️ GitHub Actions Workflow:</strong> EU-Gesetzes Navigator Auto-Update
         </div>
@@ -257,14 +228,26 @@ jobs:
   </div>
 </body>
 </html>
-HTMLEOF
+EOF
           
           # Ersetze Platzhalter
-          sed -i "s/LAW_NAME_PLACEHOLDER/$law_name/g" "laws/$law_file"
-          sed -i "s/DATE_PLACEHOLDER/$(date +'%Y-%m-%d %H:%M')/g" "laws/$law_file"
+          sed -i "s/GESETZ_NAME/$name/g" "laws/$file"
+          sed -i "s/DATUM_PLACEHOLDER/$date_now/g" "laws/$file"
           
-          echo "  ✅ Fallback für $law_name erstellt"
-        done
+          echo "  ✅ Fallback für $name erstellt"
+        }
+        
+        # Erstelle Fallbacks für alle deutschen Gesetze
+        create_fallback "de-gwg-2017.html" "Geldwäschegesetz (GwG)"
+        create_fallback "de-kwg.html" "Kreditwesengesetz (KWG)"
+        create_fallback "de-zag-2018.html" "Zahlungsdiensteaufsichtsgesetz (ZAG)"
+        create_fallback "de-awg.html" "Außenwirtschaftsgesetz (AWG)"
+        create_fallback "de-awv-2013.html" "Außenwirtschaftsverordnung (AWV)"
+        create_fallback "de-stgb.html" "Strafgesetzbuch (StGB)"
+        create_fallback "de-vag-2016.html" "Versicherungsaufsichtsgesetz (VAG)"
+        create_fallback "de-kagb.html" "Kapitalanlagegesetzbuch (KAGB)"
+        create_fallback "de-wphg.html" "Wertpapierhandelsgesetz (WpHG)"
+        create_fallback "de-eu-sanktdg.html" "EU-Sanktions-Durchführungsgesetz"
 
     # ===== METADATEN ERSTELLEN =====
     - name: 📊 Update-Metadaten erstellen
@@ -289,21 +272,25 @@ HTMLEOF
           fi
         done
         
-        # Erstelle JSON-Metadaten (vereinfacht)
-        cat > laws/last-update.json << 'JSONEOF'
+        # Erstelle JSON-Metadaten
+        timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        eu_rate=$(( eu_count * 100 / 4 ))
+        de_rate=$(( de_count * 100 / 10 ))
+        
+        cat > laws/last-update.json << EOF
 {
-  "last_update": "TIMESTAMP_PLACEHOLDER",
+  "last_update": "$timestamp",
   "success_strategy": "Robuster Fallback-Ansatz mit informativen Weiterleitungen",
   "statistics": {
     "eu_laws": {
-      "available": EU_COUNT_PLACEHOLDER,
+      "available": $eu_count,
       "total": 4,
-      "success_rate": "EU_RATE_PLACEHOLDER%"
+      "success_rate": "$eu_rate%"
     },
     "german_laws": {
-      "available": DE_COUNT_PLACEHOLDER,
+      "available": $de_count,
       "total": 10,
-      "success_rate": "DE_RATE_PLACEHOLDER%"
+      "success_rate": "$de_rate%"
     }
   },
   "laws": {
@@ -337,14 +324,7 @@ HTMLEOF
     }
   }
 }
-JSONEOF
-        
-        # Ersetze Platzhalter in JSON
-        sed -i "s/TIMESTAMP_PLACEHOLDER/$(date -u +'%Y-%m-%dT%H:%M:%SZ')/g" laws/last-update.json
-        sed -i "s/EU_COUNT_PLACEHOLDER/$eu_count/g" laws/last-update.json
-        sed -i "s/DE_COUNT_PLACEHOLDER/$de_count/g" laws/last-update.json
-        sed -i "s/EU_RATE_PLACEHOLDER/$(( eu_count * 100 / 4 ))/g" laws/last-update.json
-        sed -i "s/DE_RATE_PLACEHOLDER/$(( de_count * 100 / 10 ))/g" laws/last-update.json
+EOF
         
         echo "✅ Metadaten erstellt"
 
