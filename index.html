@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EU-Gesetzes Navigator - Enhanced Auto-Updates</title>
+    <title>EU-Gesetzes Navigator - API-Powered</title>
     <style>
         .euaml-container {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -382,148 +382,55 @@
             color: white;
         }
 
-        /* Enhanced Redirect Content Styling */
-        .redirect-container {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            border: 2px solid #3b82f6;
-            border-radius: 12px;
-            padding: 25px;
-            margin: 15px 0;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-        }
-
-        .redirect-header {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .redirect-header h3 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .sources-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .source-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 15px;
-            transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .source-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border-color: #3b82f6;
-        }
-
-        .source-card h4 {
-            margin: 0 0 8px 0;
-            color: #1e40af;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .source-card p {
-            margin: 0 0 12px 0;
-            color: #64748b;
-            font-size: 12px;
-            line-height: 1.4;
-        }
-
-        .source-btn {
-            display: inline-block;
-            background: #3b82f6;
-            color: white;
-            padding: 8px 16px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-
-        .source-btn:hover {
-            background: #2563eb;
-        }
-
-        .source-btn.secondary {
-            background: #6b7280;
-        }
-
-        .source-btn.secondary:hover {
-            background: #4b5563;
-        }
-
-        /* Markdown Content Styling für echte Gesetze */
-        .markdown-content {
+        /* API Content Styling */
+        .api-content {
             background: #ffffff;
             border-radius: 8px;
             padding: 20px;
             margin: 10px 0;
         }
 
-        .markdown-content h1,
-        .markdown-content h2,
-        .markdown-content h3 {
+        .api-content .law-header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .api-content .law-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .api-content .law-meta {
+            margin: 8px 0 0 0;
+            opacity: 0.9;
+            font-size: 12px;
+        }
+
+        .api-content h1,
+        .api-content h2,
+        .api-content h3 {
             color: #1e40af;
             border-bottom: 2px solid #e2e8f0;
             padding-bottom: 8px;
             margin: 20px 0 15px 0;
         }
 
-        .markdown-content h1 {
-            font-size: 20px;
-        }
-
-        .markdown-content h2 {
-            font-size: 18px;
-        }
-
-        .markdown-content h3 {
-            font-size: 16px;
-        }
-
-        .markdown-content p {
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-
-        .markdown-content ul,
-        .markdown-content ol {
-            margin: 10px 0;
-            padding-left: 20px;
-        }
-
-        .markdown-content li {
-            margin: 5px 0;
-        }
-
-        .markdown-content blockquote {
-            border-left: 4px solid #3b82f6;
-            background: #f8fafc;
+        .api-content .paragraph {
             margin: 15px 0;
-            padding: 10px 15px;
-            font-style: italic;
+            padding: 10px;
+            background: #f8fafc;
+            border-left: 3px solid #3b82f6;
+            border-radius: 4px;
         }
 
-        .markdown-content code {
-            background: #f1f5f9;
-            padding: 2px 4px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
+        .api-content .paragraph-number {
+            font-weight: 600;
+            color: #1e40af;
+            margin-right: 8px;
         }
 
         .content-type-indicator {
@@ -538,7 +445,12 @@
             margin-left: 8px;
         }
 
-        .content-type-indicator.redirect {
+        .content-type-indicator.api {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+        }
+
+        .content-type-indicator.fallback {
             background: rgba(245, 158, 11, 0.1);
             color: #d97706;
         }
@@ -564,10 +476,6 @@
                 min-width: unset;
                 flex: 1;
             }
-
-            .sources-grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
@@ -576,7 +484,7 @@
         <div class="euaml-header">
             <h1 class="euaml-title">
                 🇪🇺 EU-Gesetzes Navigator
-                <span class="euaml-auto-badge">Enhanced Auto-Update</span>
+                <span class="euaml-auto-badge">API-Powered</span>
             </h1>
             <div class="euaml-controls">
                 <select class="euaml-law-selector" id="euamlLawSelector">
@@ -610,10 +518,10 @@
         </div>
         <div class="euaml-content" id="euamlContent">
             <div class="euaml-info-banner">
-                <span>🤖</span>
+                <span>🚀</span>
                 <span id="statusBanner">
-                    <strong>Täglich automatisch aktualisiert</strong> um 6:00 Uhr | 
-                    EU-Verordnungen: zuverlässig | Deutsche Gesetze: enhanced sources via 
+                    <strong>API-Powered Auto-Update</strong> um 6:00 Uhr | 
+                    🇪🇺 EU: EUR-Lex | 🏛️ DE: Open Legal Data API | 
                     <a href="#" class="euaml-github-link" id="githubLink" target="_blank">GitHub Actions</a>
                 </span>
             </div>
@@ -624,7 +532,7 @@
             <div class="euaml-main-content" id="euamlMainContent">
                 <div class="euaml-loading">
                     <div class="euaml-loading-spinner"></div>
-                    <span>Lade automatisch aktualisierte Gesetze...</span>
+                    <span>Lade API-powered Gesetze...</span>
                 </div>
             </div>
         </div>
@@ -634,7 +542,7 @@
         (function() {
             'use strict';
             
-            console.log('🚀 Enhanced EU-Gesetzes Navigator startet...');
+            console.log('🚀 API-Powered EU-Gesetzes Navigator startet...');
             
             // GitHub-Konfiguration automatisch ermitteln
             function detectGitHubConfig() {
@@ -642,7 +550,6 @@
                 var currentPath = window.location.pathname;
                 
                 if (currentHost.includes('github.io')) {
-                    // GitHub Pages deployment
                     var hostParts = currentHost.split('.');
                     var username = hostParts[0];
                     
@@ -656,8 +563,7 @@
                     };
                 }
                 
-                // Fallback-Konfiguration - Nutzer sollte diese anpassen
-                console.warn('⚠️ WICHTIG: Bitte passen Sie die GitHub-Konfiguration unten an!');
+                console.warn('⚠️ WICHTIG: Passen Sie die GitHub-Konfiguration an!');
                 return {
                     username: 'obenning',      // ⚠️ HIER ANPASSEN
                     repository: 'eu-laws-navigator',    // ⚠️ HIER ANPASSEN
@@ -704,7 +610,7 @@
                     color: '#DC2626'
                 },
                 
-                // Deutsche Gesetze
+                // Deutsche Gesetze (API-powered)
                 'de_gwg_2017': {
                     name: 'Geldwäschegesetz (GwG)',
                     shortName: 'GwG',
@@ -792,7 +698,7 @@
             var articleContents = new Map();
             var searchTimeout = null;
             var lastUpdateTime = null;
-            var currentContentType = 'unknown'; // 'real', 'redirect', 'unknown'
+            var currentContentType = 'unknown';
             
             var container = null;
             var content = null;
@@ -813,7 +719,6 @@
                 githubLink = document.getElementById('githubLink');
                 statusBanner = document.getElementById('statusBanner');
                 
-                // GitHub-Link setzen
                 if (githubLink) {
                     githubLink.href = `https://github.com/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repository}/tree/${GITHUB_CONFIG.branch}/laws`;
                 }
@@ -859,7 +764,7 @@
             async function loadUpdateMetadata() {
                 try {
                     const metadataUrl = getGitHubRawUrl('last-update.json');
-                    console.log('📊 Lade Update-Metadaten von:', metadataUrl);
+                    console.log('📊 Lade Metadaten:', metadataUrl);
                     
                     const response = await fetch(metadataUrl + '?t=' + Date.now());
                     
@@ -870,15 +775,13 @@
                     const metadata = await response.json();
                     lastUpdateTime = new Date(metadata.last_update);
                     
-                    console.log('✅ Metadaten geladen - Letztes Update:', lastUpdateTime.toLocaleString('de-DE'));
-                    
-                    // Update Status Banner
+                    console.log('✅ Metadaten geladen:', lastUpdateTime.toLocaleString('de-DE'));
                     updateStatusBanner(metadata);
                     
                     return metadata;
                     
                 } catch (error) {
-                    console.warn('⚠️ Metadaten konnten nicht geladen werden:', error);
+                    console.warn('⚠️ Metadaten nicht verfügbar:', error);
                     return null;
                 }
             }
@@ -891,41 +794,39 @@
                 const deStats = stats.german_laws || {};
                 
                 const euCount = euStats.available || 0;
-                const deRealCount = deStats.real_content || 0;
-                const deFallbackCount = deStats.fallback_redirects || 0;
+                const deRealCount = deStats.real_api_content || 0;
+                const deFallbackCount = deStats.api_fallbacks || 0;
                 
                 statusBanner.innerHTML = `
-                    <strong>Enhanced Auto-Update</strong> um 6:00 Uhr | 
+                    <strong>API-Powered Auto-Update</strong> um 6:00 Uhr | 
                     🇪🇺 EU: ${euCount}/4 (${euStats.success_rate || '0%'}) | 
-                    🏛️ DE-echt: ${deRealCount}/10 | 
-                    📄 DE-redirects: ${deFallbackCount}/10 | 
-                    <a href="#" class="euaml-github-link" id="githubLink" target="_blank">Enhanced Sources</a>
+                    🏛️ DE-API: ${deRealCount}/10 | 
+                    📄 DE-Links: ${deFallbackCount}/10 | 
+                    <a href="#" class="euaml-github-link" id="githubLink" target="_blank">Open Legal Data</a>
                 `;
                 
-                // GitHub-Link neu setzen
                 const newGithubLink = document.getElementById('githubLink');
                 if (newGithubLink) {
-                    newGithubLink.href = `https://github.com/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repository}/tree/${GITHUB_CONFIG.branch}/laws`;
+                    newGithubLink.href = `https://de.openlegaldata.io/`;
                 }
             }
             
             async function loadFromGitHub(lawConfig) {
-                console.log('📥 Lade von GitHub:', lawConfig.name);
+                console.log('📥 Lade:', lawConfig.name);
                 
                 if (mainContent) {
                     mainContent.innerHTML = 
                         '<div class="euaml-loading">' +
                         '<div class="euaml-loading-spinner"></div>' +
-                        '<span>Lade ' + lawConfig.name + ' von Enhanced Sources...</span>' +
+                        '<span>Lade ' + lawConfig.name + ' (API-powered)...</span>' +
                         '</div>';
                 }
                 
                 try {
-                    // Lade zuerst Metadaten
                     await loadUpdateMetadata();
                     
                     const fileUrl = getGitHubRawUrl(lawConfig.filename);
-                    console.log('📄 Lade Gesetz von:', fileUrl);
+                    console.log('📄 Lade von:', fileUrl);
                     
                     const response = await fetch(fileUrl + '?t=' + Date.now(), {
                         method: 'GET',
@@ -942,104 +843,82 @@
                         throw new Error('Datei zu kurz oder leer');
                     }
                     
-                    console.log('✅', lawConfig.name + ' erfolgreich geladen:', html.length, 'Zeichen');
+                    console.log('✅', lawConfig.name + ' geladen:', html.length, 'Zeichen');
                     
-                    // Analysiere Content-Typ
                     const contentType = analyzeContentType(html);
                     currentContentType = contentType;
                     
-                    console.log('🔍 Content-Typ erkannt:', contentType);
+                    console.log('🔍 Content-Typ:', contentType);
                     
                     parseContent(html, lawConfig, contentType);
                     
                     const updateInfo = lastUpdateTime ? 
-                        ` (Letztes Update: ${lastUpdateTime.toLocaleString('de-DE')})` : '';
-                    const typeInfo = contentType === 'real' ? ' (Echter Gesetzestext)' : 
-                                   contentType === 'redirect' ? ' (Enhanced Redirect)' : '';
-                    showSuccess(`✅ ${lawConfig.name} erfolgreich geladen!${typeInfo}${updateInfo}`);
+                        ` (Update: ${lastUpdateTime.toLocaleString('de-DE')})` : '';
+                    const typeInfo = getContentTypeDescription(contentType);
+                    showSuccess(`✅ ${lawConfig.name} geladen!${typeInfo}${updateInfo}`);
                     
                 } catch (error) {
-                    console.error('❌ GitHub-Fehler:', error);
+                    console.error('❌ Fehler:', error);
                     showError(`Fehler beim Laden von ${lawConfig.name}: ${error.message}<br><br>` +
-                        `Prüfen Sie: <br>` +
-                        `• Repository: ${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repository}<br>` +
-                        `• Datei: laws/${lawConfig.filename}<br>` +
-                        `• GitHub Actions Workflow aktiv?`);
+                        `Repository: ${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repository}`);
                     loadFallback(lawConfig);
                 }
             }
             
             function analyzeContentType(html) {
-                // Prüfe auf Enhanced Redirect Indikatoren
-                const redirectIndicators = [
-                    'Automatische Weiterleitung',
-                    'Automatische Suche aktiv',
-                    'Enhanced Redirect',
-                    'source-card',
-                    'Offizielle Gesetzesquellen',
-                    'redirect-container'
-                ];
+                // Prüfe auf API-Content
+                if (html.includes('Open Legal Data API') || html.includes('law-header')) {
+                    return 'api';
+                }
                 
-                // Prüfe auf echte Gesetzestexte Indikatoren
-                const realContentIndicators = [
-                    'Art.',
-                    'Artikel',
-                    '§',
-                    'Paragraph',
-                    'Absatz',
-                    'Satz',
-                    'Nummer',
-                    'Buchstabe'
-                ];
+                // Prüfe auf EU-Content  
+                if (html.includes('eur-lex.europa.eu') || html.includes('CELEX') || html.includes('oj-sti-art')) {
+                    return 'eu-original';
+                }
                 
-                const htmlLower = html.toLowerCase();
+                // Prüfe auf Fallback
+                if (html.includes('API-Zugriff temporär') || html.includes('Enhanced Redirect')) {
+                    return 'fallback';
+                }
                 
-                // Zähle Indikatoren
-                let redirectScore = 0;
-                let realScore = 0;
+                // Standard EU-HTML
+                if (html.includes('Art.') || html.includes('Artikel')) {
+                    return 'eu-original';
+                }
                 
-                redirectIndicators.forEach(indicator => {
-                    if (htmlLower.includes(indicator.toLowerCase())) {
-                        redirectScore += 2;
-                    }
-                });
-                
-                realContentIndicators.forEach(indicator => {
-                    const count = (htmlLower.match(new RegExp(indicator.toLowerCase(), 'g')) || []).length;
-                    if (count > 5) realScore += count / 5; // Normalisiere
-                });
-                
-                // Prüfe Länge (längere Inhalte sind wahrscheinlich echte Gesetze)
-                if (html.length > 50000) realScore += 3;
-                else if (html.length > 20000) realScore += 2;
-                else if (html.length > 10000) realScore += 1;
-                
-                console.log('📊 Content-Analyse:', { redirectScore, realScore, length: html.length });
-                
-                if (redirectScore > realScore) {
-                    return 'redirect';
-                } else if (realScore > 2) {
-                    return 'real';
-                } else {
-                    return 'unknown';
+                return 'unknown';
+            }
+            
+            function getContentTypeDescription(contentType) {
+                switch (contentType) {
+                    case 'api':
+                        return ' (Open Legal Data API)';
+                    case 'eu-original':
+                        return ' (EUR-Lex Original)';
+                    case 'fallback':
+                        return ' (API-Fallback mit direkten Links)';
+                    default:
+                        return ' (Gesetzesinhalt)';
                 }
             }
             
             function parseContent(html, lawConfig, contentType) {
                 try {
-                    console.log('🔧 Parse HTML Content für:', lawConfig.name, '(Typ:', contentType + ')');
+                    console.log('🔧 Parse:', lawConfig.name, '(Typ:', contentType + ')');
                     
                     var tempDiv = document.createElement('div');
                     tempDiv.innerHTML = html;
                     
-                    if (contentType === 'redirect') {
-                        parseRedirectContent(tempDiv, lawConfig);
-                    } else if (contentType === 'real') {
-                        parseRealContent(tempDiv, lawConfig);
+                    if (contentType === 'api') {
+                        parseAPIContent(tempDiv, lawConfig);
+                    } else if (contentType === 'fallback') {
+                        parseFallbackContent(tempDiv, lawConfig);
+                    } else if (contentType === 'eu-original') {
+                        parseEUContent(tempDiv, lawConfig);
                     } else {
-                        // Fallback: versuche beide Methoden
-                        if (!parseRealContent(tempDiv, lawConfig)) {
-                            parseRedirectContent(tempDiv, lawConfig);
+                        // Versuche automatische Erkennung
+                        if (!parseEUContent(tempDiv, lawConfig) && !parseAPIContent(tempDiv, lawConfig)) {
+                            parseFallbackContent(tempDiv, lawConfig);
                         }
                     }
                     
@@ -1052,50 +931,94 @@
                 }
             }
             
-            function parseRedirectContent(tempDiv, lawConfig) {
-                console.log('📄 Verarbeite Enhanced Redirect Content');
+            function parseAPIContent(tempDiv, lawConfig) {
+                console.log('🔌 Verarbeite API-Content');
                 
-                // Erstelle eine spezielle Sektion für Redirect-Content
-                sections = [{
-                    number: 1,
-                    title: "📄 Offizielle Quellen für " + lawConfig.shortName,
-                    articles: [{
-                        number: 1,
-                        title: "Zugang zu aktuellen Gesetzestexten",
-                        id: "redirect_info"
-                    }]
-                }];
+                // Finde alle Paragraphen/Artikel in API-Content
+                var paragraphs = [];
+                var allHeaders = tempDiv.querySelectorAll('h1, h2, h3, h4, .paragraph-number, .law-title');
                 
-                // Speichere den Redirect-Content direkt
-                var content = tempDiv.innerHTML;
-                
-                // Verbessere die Darstellung
-                content = content.replace(/class="container"/g, 'class="redirect-container"');
-                content = content.replace(/class="sources"/g, 'class="sources-grid"');
-                
-                articleContents.set("redirect_info", content);
-                
-                return true;
-            }
-            
-            function parseRealContent(tempDiv, lawConfig) {
-                console.log('📜 Verarbeite echten Gesetzestext');
-                
-                try {
-                    if (lawConfig.type === 'eu-regulation') {
-                        return parseEURegulationStructure(tempDiv, lawConfig);
-                    } else if (lawConfig.type === 'german-law') {
-                        return parseGermanLawStructure(tempDiv, lawConfig);
+                for (var i = 0; i < allHeaders.length; i++) {
+                    var header = allHeaders[i];
+                    var text = header.textContent.trim();
+                    
+                    // 🔧 FIX: Überspringe Titel als separate Artikel
+                    if (isLawTitle(text, lawConfig)) {
+                        console.log('⏭️ Überspringe Titel:', text);
+                        continue;
                     }
-                    return false;
-                } catch (error) {
-                    console.warn('⚠️ Parsing als echter Content fehlgeschlagen:', error);
-                    return false;
+                    
+                    // Suche nach Paragraphen/Artikeln
+                    var match = text.match(/(?:§|Art\.?|Artikel)\s*(\d+)/i);
+                    if (match) {
+                        var num = parseInt(match[1], 10);
+                        if (num > 0 && num < 1000) {
+                            var title = text.replace(/(?:§|Art\.?|Artikel)\s*\d+\s*[-–]?\s*/i, '').trim();
+                            if (!title) title = (lawConfig.type === 'german-law' ? '§ ' : 'Art. ') + num;
+                            
+                            paragraphs.push({
+                                number: num,
+                                title: title,
+                                id: 'para_' + num,
+                                element: header
+                            });
+                            
+                            console.log(`📄 ${lawConfig.type === 'german-law' ? '§' : 'Art.'} ${num}: ${title}`);
+                        }
+                    }
+                }
+                
+                if (paragraphs.length > 0) {
+                    paragraphs.sort(function(a, b) { return a.number - b.number; });
+                    sections = groupParagraphs(paragraphs, lawConfig);
+                    extractAPIArticleContents(tempDiv, paragraphs, lawConfig);
+                    return true;
+                } else {
+                    // Fallback: Erstelle einzelnen Artikel mit gesamtem Inhalt
+                    console.log('📄 Keine Paragraphen gefunden, erstelle Gesamt-Artikel');
+                    sections = [{
+                        number: 1,
+                        title: lawConfig.shortName + " - Gesetzestext",
+                        articles: [{
+                            number: 1,
+                            title: "Vollständiger Gesetzestext",
+                            id: "full_text"
+                        }]
+                    }];
+                    
+                    // Bereinige HTML für bessere Darstellung
+                    var cleanContent = tempDiv.innerHTML;
+                    cleanContent = '<div class="api-content">' + cleanContent + '</div>';
+                    articleContents.set("full_text", cleanContent);
+                    return true;
                 }
             }
             
-            function parseEURegulationStructure(tempDiv, lawConfig) {
-                // EU-Regulation Parsing (bereits implementiert)
+            function isLawTitle(text, lawConfig) {
+                // Erkenne und überspringe Gesetzestitel
+                var titleIndicators = [
+                    lawConfig.name,
+                    lawConfig.shortName,
+                    'gesetz',
+                    'verordnung',
+                    'grundverordnung'
+                ];
+                
+                var lowerText = text.toLowerCase();
+                for (var i = 0; i < titleIndicators.length; i++) {
+                    if (lowerText.includes(titleIndicators[i].toLowerCase())) {
+                        // Aber nicht wenn es auch Paragraph/Artikel-Nummer enthält
+                        if (!text.match(/(?:§|Art\.?|Artikel)\s*\d+/i)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            
+            function parseEUContent(tempDiv, lawConfig) {
+                console.log('🇪🇺 Verarbeite EU-Content');
+                
                 var selectors = [
                     '[id^="art_"]',
                     '[id^="article_"]',
@@ -1107,290 +1030,73 @@
                 for (var s = 0; s < selectors.length; s++) {
                     var found = tempDiv.querySelectorAll(selectors[s]);
                     if (found.length > 0) {
-                        console.log(`✅ EU-Regulation - Gefunden mit Selector "${selectors[s]}":`, found.length, 'Artikel');
+                        console.log(`✅ EU-Struktur gefunden (${selectors[s]}):`, found.length, 'Artikel');
                         articleElements = found;
                         break;
                     }
                 }
                 
                 if (articleElements.length > 0) {
-                    sections = createSectionsFromElements(articleElements, lawConfig);
-                    extractArticleContents(tempDiv, lawConfig);
-                    return true;
-                }
-                
-                return false;
-            }
-            
-            function parseGermanLawStructure(tempDiv, lawConfig) {
-                console.log('🏛️ Parse deutsche Gesetze-Struktur für:', lawConfig.shortName);
-                
-                // Suche nach verschiedenen Strukturen
-                var strategies = [
-                    // Strategie 1: Markdown-basierte Struktur (Bundestag GitHub)
-                    function() {
-                        var headers = tempDiv.querySelectorAll('h1, h2, h3, h4');
-                        var paragraphs = [];
+                    var allArticles = [];
+                    var processedIds = new Set();
+                    
+                    for (var i = 0; i < articleElements.length; i++) {
+                        var element = articleElements[i];
                         
-                        for (var i = 0; i < headers.length; i++) {
-                            var header = headers[i];
-                            var text = header.textContent.trim();
-                            
-                            // Suche nach Paragraph-Mustern
-                            var match = text.match(/§\s*(\d+)/);
-                            if (match) {
-                                var num = parseInt(match[1], 10);
-                                paragraphs.push({
+                        if (processedIds.has(element.id)) continue;
+                        processedIds.add(element.id);
+                        
+                        var match = element.id.match(/art[icle]*[_-]?(\d+)/i);
+                        if (match) {
+                            var num = parseInt(match[1], 10);
+                            if (num > 0 && num < 1000) {
+                                var title = extractEUTitle(element, num);
+                                
+                                allArticles.push({
                                     number: num,
-                                    title: text.replace(/§\s*\d+\s*[-–]?\s*/, ''),
-                                    id: 'para_' + num,
-                                    element: header
+                                    title: title,
+                                    id: element.id
                                 });
+                                
+                                console.log(`📄 Art. ${num}: ${title}`);
                             }
                         }
-                        
-                        if (paragraphs.length > 3) {
-                            console.log('✅ Markdown-Struktur erkannt:', paragraphs.length, 'Paragraphen');
-                            return paragraphs;
-                        }
-                        return null;
-                    },
-                    
-                    // Strategie 2: HTML-basierte Struktur
-                    function() {
-                        var selectors = [
-                            '[id^="para"]',
-                            '[id^="P"]',
-                            '[id*="paragraph"]',
-                            'div.jurAbsatz',
-                            '.norm'
-                        ];
-                        
-                        for (var s = 0; s < selectors.length; s++) {
-                            var found = tempDiv.querySelectorAll(selectors[s]);
-                            if (found.length > 0) {
-                                console.log('✅ HTML-Struktur erkannt mit', selectors[s] + ':', found.length, 'Elemente');
-                                return Array.from(found).map(function(el, index) {
-                                    return {
-                                        number: index + 1,
-                                        title: extractGermanTitle(el, index + 1),
-                                        id: el.id || 'para_' + (index + 1),
-                                        element: el
-                                    };
-                                });
-                            }
-                        }
-                        return null;
                     }
-                ];
-                
-                // Versuche Strategien nacheinander
-                for (var i = 0; i < strategies.length; i++) {
-                    var result = strategies[i]();
-                    if (result && result.length > 0) {
-                        var grouped = groupGermanParagraphs(result, lawConfig);
-                        if (grouped && grouped.length > 0) {
-                            sections = grouped;
-                            extractGermanArticleContents(tempDiv, result, lawConfig);
-                            return true;
-                        }
+                    
+                    if (allArticles.length > 0) {
+                        allArticles.sort(function(a, b) { return a.number - b.number; });
+                        sections = groupEUArticles(allArticles, lawConfig);
+                        extractEUArticleContents(tempDiv, lawConfig);
+                        return true;
                     }
                 }
                 
                 return false;
             }
             
-            function extractGermanArticleContents(tempDiv, paragraphs, lawConfig) {
-                console.log('📄 Extrahiere deutsche Paragraph-Inhalte');
+            function parseFallbackContent(tempDiv, lawConfig) {
+                console.log('📄 Verarbeite Fallback-Content');
                 
-                for (var i = 0; i < paragraphs.length; i++) {
-                    var para = paragraphs[i];
-                    var content = '';
-                    
-                    if (para.element) {
-                        // Sammle Content ab diesem Element bis zum nächsten
-                        var current = para.element;
-                        var contentElements = [current];
-                        
-                        // Sammle nachfolgende Elemente bis zum nächsten Header
-                        var next = current.nextElementSibling;
-                        while (next && !isHeaderElement(next)) {
-                            contentElements.push(next);
-                            next = next.nextElementSibling;
-                        }
-                        
-                        // Kombiniere Content
-                        content = contentElements.map(function(el) {
-                            return el.outerHTML;
-                        }).join('\n');
-                        
-                        // Formatiere als Markdown-Content
-                        content = '<div class="markdown-content">' + content + '</div>';
-                    } else {
-                        // Fallback: einfacher Text
-                        content = '<div class="markdown-content"><p><em>Paragraph-Inhalt nicht verfügbar. ' +
-                                'Besuchen Sie die offiziellen Quellen für den vollständigen Text.</em></p></div>';
-                    }
-                    
-                    if (content.trim()) {
-                        articleContents.set(para.id, content);
-                    }
-                }
+                sections = [{
+                    number: 1,
+                    title: "📄 Zugang zu " + lawConfig.shortName,
+                    articles: [{
+                        number: 1,
+                        title: "Direkte Links zu offiziellen Quellen",
+                        id: "fallback_info"
+                    }]
+                }];
                 
-                console.log('✅ Deutsche Paragraph-Inhalte extrahiert:', articleContents.size);
+                var content = tempDiv.innerHTML;
+                articleContents.set("fallback_info", content);
+                return true;
             }
             
-            function isHeaderElement(element) {
-                if (!element) return false;
-                var tagName = element.tagName.toLowerCase();
-                return ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tagName) ||
-                       element.textContent.match(/§\s*\d+/) ||
-                       element.classList.contains('header') ||
-                       element.classList.contains('titel');
-            }
-            
-            function extractGermanTitle(element, paraNum) {
-                if (!element) return '§ ' + paraNum;
-                
-                var text = element.textContent.trim();
-                
-                // Bereinige den Titel
-                text = text.replace(/^§\s*\d+\s*[-–]?\s*/i, '');
-                
-                if (text.length > 2 && text.length < 200) {
-                    return text;
-                }
-                
-                return '§ ' + paraNum;
-            }
-            
-            function groupGermanParagraphs(allParagraphs, lawConfig) {
-                // Sortiere nach Paragraph-Nummer
-                allParagraphs.sort(function(a, b) { return a.number - b.number; });
-                
-                // Spezifische Gruppierung je nach Gesetz
-                switch (lawConfig.shortName) {
-                    case 'GwG':
-                        return groupGwGParagraphs(allParagraphs);
-                    case 'KWG':
-                        return groupKWGParagraphs(allParagraphs);
-                    case 'StGB':
-                        return groupStGBParagraphs(allParagraphs);
-                    default:
-                        return groupDefaultGermanParagraphs(allParagraphs);
-                }
-            }
-            
-            function groupGwGParagraphs(allParagraphs) {
-                var ranges = [
-                    { title: "Allgemeine Bestimmungen", start: 1, end: 5 },
-                    { title: "Sorgfaltspflichten", start: 6, end: 15 },
-                    { title: "Meldepflichten", start: 16, end: 20 },
-                    { title: "Organisationspflichten", start: 21, end: 30 },
-                    { title: "Aufsicht", start: 31, end: 50 },
-                    { title: "Straf- und Bußgeldvorschriften", start: 51, end: 70 }
-                ];
-                return createSectionsFromRanges(ranges, allParagraphs);
-            }
-            
-            function groupKWGParagraphs(allParagraphs) {
-                var ranges = [
-                    { title: "Allgemeine Bestimmungen", start: 1, end: 10 },
-                    { title: "Erlaubnis und Beaufsichtigung", start: 11, end: 30 },
-                    { title: "Geschäftstätigkeit", start: 31, end: 50 },
-                    { title: "Sondervorschriften", start: 51, end: 100 }
-                ];
-                return createSectionsFromRanges(ranges, allParagraphs);
-            }
-            
-            function groupStGBParagraphs(allParagraphs) {
-                var ranges = [
-                    { title: "Geldwäsche-relevante Bestimmungen", start: 260, end: 262 },
-                    { title: "Weitere Straftatbestände", start: 1, end: 300 }
-                ];
-                return createSectionsFromRanges(ranges, allParagraphs);
-            }
-            
-            function groupDefaultGermanParagraphs(allParagraphs) {
-                var ranges = [
-                    { title: "Allgemeine Bestimmungen", start: 1, end: 10 },
-                    { title: "Hauptteil", start: 11, end: 50 },
-                    { title: "Weitere Bestimmungen", start: 51, end: 100 },
-                    { title: "Schlussbestimmungen", start: 101, end: 999 }
-                ];
-                return createSectionsFromRanges(ranges, allParagraphs);
-            }
-            
-            function createSectionsFromRanges(ranges, allArticles) {
-                var result = [];
-                
-                for (var i = 0; i < ranges.length; i++) {
-                    var range = ranges[i];
-                    var sectionArticles = [];
-                    
-                    for (var j = 0; j < allArticles.length; j++) {
-                        var article = allArticles[j];
-                        if (article.number >= range.start && article.number <= range.end) {
-                            sectionArticles.push(article);
-                        }
-                    }
-                    
-                    if (sectionArticles.length > 0) {
-                        result.push({
-                            number: i + 1,
-                            title: range.title,
-                            articles: sectionArticles
-                        });
-                    }
-                }
-                
-                return result;
-            }
-            
-            // Bereits implementierte Funktionen beibehalten...
-            function createSectionsFromElements(elements, lawConfig) {
-                var allArticles = [];
-                var processedIds = new Set();
-                
-                for (var i = 0; i < elements.length; i++) {
-                    var element = elements[i];
-                    
-                    if (processedIds.has(element.id)) continue;
-                    processedIds.add(element.id);
-                    
-                    var match = element.id.match(/art[icle]*[_-]?(\d+)/i);
-                    if (match) {
-                        var num = parseInt(match[1], 10);
-                        if (num > 0 && num < 1000) {
-                            var title = extractTitle(element, num);
-                            
-                            allArticles.push({
-                                number: num,
-                                title: title,
-                                id: element.id
-                            });
-                            
-                            console.log(`📄 Artikel ${num}: ${title}`);
-                        }
-                    }
-                }
-                
-                allArticles.sort(function(a, b) { return a.number - b.number; });
-                return groupArticles(allArticles, lawConfig);
-            }
-            
-            function extractTitle(element, articleNum) {
+            function extractEUTitle(element, articleNum) {
                 var selectors = ['.oj-sti-art', '.eli-title', '.title', 'h1', 'h2', 'h3', 'strong', 'b'];
                 
                 for (var s = 0; s < selectors.length; s++) {
                     var titleEl = element.querySelector ? element.querySelector(selectors[s]) : null;
-                    if (!titleEl && element.textContent) {
-                        var text = element.textContent.trim();
-                        if (text.length > 3 && text.length < 200) {
-                            return text.replace(/^Artikel\s+\d+\s*[-–]?\s*/i, '');
-                        }
-                    }
-                    
                     if (titleEl) {
                         var text = titleEl.textContent.trim();
                         if (text.length > 2 && text.length < 200) {
@@ -1399,10 +1105,68 @@
                     }
                 }
                 
+                var text = element.textContent.trim();
+                if (text.length > 3 && text.length < 200) {
+                    return text.replace(/^Artikel\s+\d+\s*[-–]?\s*/i, '');
+                }
+                
                 return 'Artikel ' + articleNum;
             }
             
-            function groupArticles(allArticles, lawConfig) {
+            function groupParagraphs(paragraphs, lawConfig) {
+                switch (lawConfig.shortName) {
+                    case 'GwG':
+                        return groupGwGParagraphs(paragraphs);
+                    case 'KWG':
+                        return groupKWGParagraphs(paragraphs);
+                    case 'StGB':
+                        return groupStGBParagraphs(paragraphs);
+                    default:
+                        return groupDefaultParagraphs(paragraphs);
+                }
+            }
+            
+            function groupGwGParagraphs(paragraphs) {
+                var ranges = [
+                    { title: "Allgemeine Bestimmungen", start: 1, end: 5 },
+                    { title: "Sorgfaltspflichten", start: 6, end: 15 },
+                    { title: "Meldepflichten", start: 16, end: 20 },
+                    { title: "Organisationspflichten", start: 21, end: 30 },
+                    { title: "Aufsicht", start: 31, end: 50 },
+                    { title: "Straf- und Bußgeldvorschriften", start: 51, end: 70 }
+                ];
+                return createSectionsFromRanges(ranges, paragraphs);
+            }
+            
+            function groupKWGParagraphs(paragraphs) {
+                var ranges = [
+                    { title: "Allgemeine Bestimmungen", start: 1, end: 10 },
+                    { title: "Erlaubnis und Beaufsichtigung", start: 11, end: 30 },
+                    { title: "Geschäftstätigkeit", start: 31, end: 50 },
+                    { title: "Sondervorschriften", start: 51, end: 100 }
+                ];
+                return createSectionsFromRanges(ranges, paragraphs);
+            }
+            
+            function groupStGBParagraphs(paragraphs) {
+                var ranges = [
+                    { title: "Geldwäsche-relevante Bestimmungen", start: 260, end: 262 },
+                    { title: "Weitere Straftatbestände", start: 1, end: 300 }
+                ];
+                return createSectionsFromRanges(ranges, paragraphs);
+            }
+            
+            function groupDefaultParagraphs(paragraphs) {
+                var ranges = [
+                    { title: "Allgemeine Bestimmungen", start: 1, end: 10 },
+                    { title: "Hauptteil", start: 11, end: 50 },
+                    { title: "Weitere Bestimmungen", start: 51, end: 100 },
+                    { title: "Schlussbestimmungen", start: 101, end: 999 }
+                ];
+                return createSectionsFromRanges(ranges, paragraphs);
+            }
+            
+            function groupEUArticles(allArticles, lawConfig) {
                 switch (lawConfig.shortName) {
                     case 'GDPR':
                         return groupGDPRArticles(allArticles);
@@ -1427,7 +1191,6 @@
                     { title: "Rechtsbehelfe und Sanktionen", start: 85, end: 91 },
                     { title: "Schlussbestimmungen", start: 92, end: 99 }
                 ];
-                
                 return createSectionsFromRanges(ranges, allArticles);
             }
             
@@ -1440,7 +1203,6 @@
                     { title: "Meldepflichten", start: 69, end: 75 },
                     { title: "Schlussbestimmungen", start: 76, end: 95 }
                 ];
-                
                 return createSectionsFromRanges(ranges, allArticles);
             }
             
@@ -1454,7 +1216,6 @@
                     { title: "Sanktionen", start: 79, end: 83 },
                     { title: "Schlussbestimmungen", start: 84, end: 113 }
                 ];
-                
                 return createSectionsFromRanges(ranges, allArticles);
             }
             
@@ -1467,14 +1228,76 @@
                     { title: "Durchsetzung", start: 69, end: 87 },
                     { title: "Schlussbestimmungen", start: 88, end: 94 }
                 ];
-                
                 return createSectionsFromRanges(ranges, allArticles);
             }
             
-            function extractArticleContents(tempDiv, lawConfig) {
-                var selectors = lawConfig.type === 'eu-regulation' ? 
-                    ['[id^="art_"]', '[id^="article_"]', '[id^="Art"]', '[id*="article"]'] :
-                    ['[id^="para"]', '[id^="P"]', '[id*="paragraph"]', 'div.jurAbsatz', '.norm'];
+            function createSectionsFromRanges(ranges, allItems) {
+                var result = [];
+                
+                for (var i = 0; i < ranges.length; i++) {
+                    var range = ranges[i];
+                    var sectionItems = [];
+                    
+                    for (var j = 0; j < allItems.length; j++) {
+                        var item = allItems[j];
+                        if (item.number >= range.start && item.number <= range.end) {
+                            sectionItems.push(item);
+                        }
+                    }
+                    
+                    if (sectionItems.length > 0) {
+                        result.push({
+                            number: i + 1,
+                            title: range.title,
+                            articles: sectionItems
+                        });
+                    }
+                }
+                
+                return result;
+            }
+            
+            function extractAPIArticleContents(tempDiv, paragraphs, lawConfig) {
+                console.log('📄 Extrahiere API-Artikel-Inhalte');
+                
+                for (var i = 0; i < paragraphs.length; i++) {
+                    var para = paragraphs[i];
+                    var content = '';
+                    
+                    if (para.element) {
+                        var current = para.element;
+                        var contentElements = [current];
+                        
+                        var next = current.nextElementSibling;
+                        while (next && !isHeaderElement(next)) {
+                            contentElements.push(next);
+                            next = next.nextElementSibling;
+                        }
+                        
+                        content = contentElements.map(function(el) {
+                            return el.outerHTML;
+                        }).join('\n');
+                        
+                        content = '<div class="api-content">' + content + '</div>';
+                    } else {
+                        content = '<div class="api-content"><p><em>Inhalt nicht verfügbar.</em></p></div>';
+                    }
+                    
+                    if (content.trim()) {
+                        articleContents.set(para.id, content);
+                    }
+                }
+                
+                console.log('✅ API-Artikel-Inhalte extrahiert:', articleContents.size);
+            }
+            
+            function extractEUArticleContents(tempDiv, lawConfig) {
+                var selectors = [
+                    '[id^="art_"]',
+                    '[id^="article_"]', 
+                    '[id^="Art"]',
+                    '[id*="article"]'
+                ];
                 
                 var articleElements = [];
                 for (var s = 0; s < selectors.length; s++) {
@@ -1485,39 +1308,29 @@
                     }
                 }
                 
-                console.log('📄 Extrahiere Inhalte für', articleElements.length, 
-                          lawConfig.type === 'german-law' ? 'Paragraphen' : 'Artikel');
+                console.log('📄 Extrahiere EU-Artikel-Inhalte:', articleElements.length);
 
                 for (var i = 0; i < articleElements.length; i++) {
                     var article = articleElements[i];
                     var content = article.cloneNode(true);
 
-                    // Bereinige Content
                     var unwanted = content.querySelectorAll('script, style, .nav, .navigation, .breadcrumb');
                     for (var u = 0; u < unwanted.length; u++) {
                         unwanted[u].remove();
                     }
 
-                    // Formatiere je nach Typ
-                    if (lawConfig.type === 'eu-regulation') {
-                        formatEUContent(content);
-                    } else if (lawConfig.type === 'german-law') {
-                        formatGermanContent(content);
-                    }
+                    formatEUContent(content);
 
                     var cleanContent = content.innerHTML.trim();
                     if (cleanContent) {
-                        // Wrappen in markdown-content für bessere Darstellung
-                        cleanContent = '<div class="markdown-content">' + cleanContent + '</div>';
                         articleContents.set(article.id, cleanContent);
                     }
                 }
 
-                console.log('✅ Artikel-Inhalte extrahiert:', articleContents.size);
+                console.log('✅ EU-Artikel-Inhalte extrahiert:', articleContents.size);
             }
             
             function formatEUContent(contentDiv) {
-                // EU-Formatierung (bereits implementiert)
                 var normalPs = contentDiv.querySelectorAll('p');
                 for (var p = 0; p < normalPs.length; p++) {
                     var para = normalPs[p];
@@ -1535,99 +1348,47 @@
                             '</div>';
                     }
                 }
+                
+                var articleTitles = contentDiv.querySelectorAll('.oj-ti-art, .title, h1, h2, h3');
+                for (var t = 0; t < articleTitles.length; t++) {
+                    var titleP = articleTitles[t];
+                    titleP.style.cssText = 'font-weight: 600; color: #063AA8; margin: 1em 0 0.5em 0; font-size: 1.1em;';
+                }
             }
             
-            function formatGermanContent(contentDiv) {
-                // Deutsche Formatierung (bereits implementiert)
-                var paragraphs = contentDiv.querySelectorAll('p, .absatz, .jurAbsatz');
-                for (var p = 0; p < paragraphs.length; p++) {
-                    var para = paragraphs[p];
-                    var text = para.textContent.trim();
-                    
-                    var match = text.match(/^\((\d+)\)\s+(.+)$/);
-                    if (match) {
-                        var absatzNum = match[1];
-                        var absatzText = match[2];
-                        
-                        para.innerHTML = 
-                            '<div style="margin: 0.5em 0; padding-left: 1.5em; position: relative;">' +
-                            '<span style="position: absolute; left: 0; font-weight: 500; color: #B91C1C;">(' + absatzNum + ')</span>' +
-                            absatzText +
-                            '</div>';
-                    }
-                }
+            function isHeaderElement(element) {
+                if (!element) return false;
+                var tagName = element.tagName.toLowerCase();
+                return ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tagName) ||
+                       element.textContent.match(/(?:§|Art\.?|Artikel)\s*\d+/) ||
+                       element.classList.contains('law-title') ||
+                       element.classList.contains('paragraph-number');
             }
             
             function loadFallback(lawConfig) {
-                console.log('🔄 Lade Fallback-Content für:', lawConfig.name);
+                console.log('🔄 Lade Fallback für:', lawConfig.name);
                 
-                if (lawConfig.shortName === 'GDPR') {
-                    sections = createGDPRFallback();
-                } else if (lawConfig.shortName === 'AI Act') {
-                    sections = createAIActFallback();
-                } else if (lawConfig.shortName === 'DSA') {
-                    sections = createDSAFallback();
-                } else {
-                    sections = createAMLFallback();
-                }
+                sections = [{
+                    number: 1,
+                    title: "⚠️ Temporärer Zugang",
+                    articles: [{
+                        number: 1,
+                        title: "Direktlinks zu " + lawConfig.shortName,
+                        id: "temp_fallback"
+                    }]
+                }];
                 
+                var fallbackContent = `
+                    <div style="text-align: center; padding: 40px;">
+                        <h3>${lawConfig.name}</h3>
+                        <p><strong>Temporär nicht verfügbar.</strong></p>
+                        <p><a href="https://de.openlegaldata.io/" target="_blank">→ Open Legal Data</a></p>
+                        <p><a href="https://www.gesetze-im-internet.de/" target="_blank">→ gesetze-im-internet.de</a></p>
+                    </div>
+                `;
+                
+                articleContents.set("temp_fallback", fallbackContent);
                 renderSections();
-            }
-            
-            function createGDPRFallback() {
-                return [{
-                    number: 1,
-                    title: "Allgemeine Bestimmungen",
-                    articles: [
-                        { number: 1, title: "Gegenstand und Ziele", id: "art_1" },
-                        { number: 2, title: "Sachlicher Anwendungsbereich", id: "art_2" },
-                        { number: 3, title: "Räumlicher Anwendungsbereich", id: "art_3" },
-                        { number: 4, title: "Begriffsbestimmungen", id: "art_4" }
-                    ]
-                }, {
-                    number: 2,
-                    title: "Grundsätze",
-                    articles: [
-                        { number: 5, title: "Grundsätze für die Verarbeitung personenbezogener Daten", id: "art_5" },
-                        { number: 6, title: "Rechtmäßigkeit der Verarbeitung", id: "art_6" }
-                    ]
-                }];
-            }
-            
-            function createAMLFallback() {
-                return [{
-                    number: 1,
-                    title: "Allgemeine Bestimmungen",
-                    articles: [
-                        { number: 1, title: "Gegenstand", id: "art_1" },
-                        { number: 2, title: "Begriffsbestimmungen", id: "art_2" },
-                        { number: 3, title: "Anwendungsbereich", id: "art_3" }
-                    ]
-                }];
-            }
-            
-            function createAIActFallback() {
-                return [{
-                    number: 1,
-                    title: "Allgemeine Bestimmungen",
-                    articles: [
-                        { number: 1, title: "Gegenstand und Anwendungsbereich", id: "art_1" },
-                        { number: 3, title: "Begriffsbestimmungen", id: "art_3" },
-                        { number: 4, title: "Änderungen von Anhängen", id: "art_4" }
-                    ]
-                }];
-            }
-            
-            function createDSAFallback() {
-                return [{
-                    number: 1,
-                    title: "Allgemeine Bestimmungen",
-                    articles: [
-                        { number: 1, title: "Gegenstand und Anwendungsbereich", id: "art_1" },
-                        { number: 2, title: "Begriffsbestimmungen", id: "art_2" },
-                        { number: 3, title: "Anwendungsbereich", id: "art_3" }
-                    ]
-                }];
             }
             
             function renderSections(filter) {
@@ -1645,7 +1406,8 @@
                     
                     for (var j = 0; j < section.articles.length; j++) {
                         var article = section.articles[j];
-                        var searchableText = (getArticlePrefix(lawConfig) + article.number + ' ' + article.title).toLowerCase();
+                        var prefix = getArticlePrefix(lawConfig);
+                        var searchableText = (prefix + article.number + ' ' + article.title).toLowerCase();
                         var titleMatch = !searchText || searchableText.indexOf(searchText) !== -1;
                         var contentMatch = false;
                         
@@ -1664,7 +1426,7 @@
                             
                             sectionHtml += '<div class="euaml-article' + (contentMatch ? ' euaml-content-match' : '') + '" data-article-id="' + article.id + '">';
                             sectionHtml += '<div class="euaml-article-title">';
-                            sectionHtml += '<span>' + getArticlePrefix(lawConfig) + article.number + ' - ' + highlightedTitle + '</span>';
+                            sectionHtml += '<span>' + prefix + article.number + ' - ' + highlightedTitle + '</span>';
                             sectionHtml += '<div class="euaml-article-meta">';
                             sectionHtml += '<span class="law-badge ' + badgeClass + '">' + lawConfig.shortName + '</span>';
                             sectionHtml += contentTypeIndicator;
@@ -1698,7 +1460,7 @@
                 
                 mainContent.innerHTML = html;
                 bindEvents();
-                console.log('✅ Sections gerendert mit Filter:', filter);
+                console.log('✅ Sections gerendert');
             }
             
             function getArticlePrefix(lawConfig) {
@@ -1706,10 +1468,12 @@
             }
             
             function getContentTypeIndicator() {
-                if (currentContentType === 'real') {
-                    return '<span class="content-type-indicator">Echt</span>';
-                } else if (currentContentType === 'redirect') {
-                    return '<span class="content-type-indicator redirect">Redirect</span>';
+                if (currentContentType === 'api') {
+                    return '<span class="content-type-indicator api">API</span>';
+                } else if (currentContentType === 'eu-original') {
+                    return '<span class="content-type-indicator">Original</span>';
+                } else if (currentContentType === 'fallback') {
+                    return '<span class="content-type-indicator fallback">Links</span>';
                 }
                 return '';
             }
@@ -1894,7 +1658,7 @@
             }
             
             function init() {
-                console.log('🚀 Initialisiere Enhanced Navigator...');
+                console.log('🚀 Initialisiere API-Powered Navigator...');
                 
                 if (!initElements()) {
                     console.error('❌ DOM-Elemente nicht gefunden');
@@ -1903,11 +1667,10 @@
                 
                 initEventListeners();
                 
-                // Lade Standard-Gesetz
                 var lawConfig = AVAILABLE_LAWS[currentLaw];
                 loadFromGitHub(lawConfig);
                 
-                console.log('✅ Enhanced Navigator initialisiert');
+                console.log('✅ API-Powered Navigator initialisiert');
             }
             
             if (document.readyState === 'loading') {
