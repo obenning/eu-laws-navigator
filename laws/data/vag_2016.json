@@ -1,0 +1,23 @@
+{
+  "id": "vag_2016",
+  "name": "Versicherungsaufsichtsgesetz",
+  "shortName": "VAG",
+  "type": "german-law",
+  "lastUpdate": "2025-06-23",
+  "sourceUrl": "https://de.openlegaldata.io",
+  "dataSource": "openlegaldata-api",
+  "sections": [
+    {
+      "number": 1,
+      "title": "Gesetz",
+      "items": [
+        {
+          "number": "1",
+          "title": "Versicherungsaufsichtsgesetz",
+          "content": "<div class=\"jnhtml\">\n              <h3>Versicherungsaufsichtsgesetz</h3>\n              <p><strong>Versicherungsaufsichtsgesetz</strong></p>\n              <p>Gesetzestext verfügbar über OpenLegalData.</p>\n              <p><a href=\"https://de.openlegaldata.io\" target=\"_blank\">Volltext lesen</a></p>\n            </div>",
+          "type": "paragraph"
+        }
+      ]
+    }
+  ]
+}

@@ -1,18 +1,20 @@
 {
   "id": "awg_2013",
-  "name": "Außenwirtschaftsgesetz (AWG)", 
+  "name": "Außenwirtschaftsgesetz",
   "shortName": "AWG",
   "type": "german-law",
   "lastUpdate": "2025-06-23",
+  "sourceUrl": "https://de.openlegaldata.io",
+  "dataSource": "openlegaldata-api",
   "sections": [
     {
       "number": 1,
-      "title": "Gesetz (Weiterleitung)",
+      "title": "Gesetz",
       "items": [
         {
           "number": "1",
-          "title": "Volltext verfügbar",
-          "content": "<div class=\"jnhtml\"><h3>Außenwirtschaftsgesetz (AWG)</h3><p>Der vollständige Text ist verfügbar unter:</p><p><a href=\"https://www.gesetze-im-internet.de/awg_2013/\" target=\"_blank\">Gesetze-im-Internet öffnen</a></p><p><a href=\"https://www.buzer.de/gesetz/awg_2013/\" target=\"_blank\">Auf Buzer.de durchsuchen</a></p></div>",
+          "title": "Außenwirtschaftsgesetz",
+          "content": "<div class=\"jnhtml\">\n              <h3>Außenwirtschaftsgesetz</h3>\n              <p><strong>Außenwirtschaftsgesetz</strong></p>\n              <p>Gesetzestext verfügbar über OpenLegalData.</p>\n              <p><a href=\"https://de.openlegaldata.io\" target=\"_blank\">Volltext lesen</a></p>\n            </div>",
           "type": "paragraph"
         }
       ]

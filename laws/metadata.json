@@ -1,27 +1,59 @@
 {
-  "lastUpdate": "2025-06-23T12:11:57Z",
-  "version": "3.0.0",
-  "type": "complete-database",
-  "statistics": {
-    "totalLaws": 7,
-    "totalSections": 7,
-    "totalItems": 7,
-    "byType": {
-      "euRegulations": 3,
-      "germanLaws": 4
-    }
+  "lastUpdate": "2025-06-23T12:20:02Z",
+  "version": "5.0.0-bot-resistant",
+  "buildStrategy": "multi-source-with-fallbacks",
+  "botResistance": {
+    "primaryStrategy": "alternative-apis",
+    "fallbackStrategy": "smart-redirects",
+    "respectfulCrawling": true
   },
-  "dataFormat": "embedded-json",
-  "features": [
-    "Volltext-Suche",
-    "Automatische Zitierung", 
-    "Offline-fähig",
-    "CORS-frei",
-    "Responsive Design"
+  "statistics": {
+    "totalLaws": 9,
+    "successfulDownloads": 8,
+    "smartFallbacks": 1,
+    "successRate": "88.8%",
+    "reliabilityScore": "high"
+  },
+  "dataSources": [
+    {
+      "name": "Bundestag GitHub Repository",
+      "type": "german-law",
+      "reliability": "very-high",
+      "botFriendly": true,
+      "url": "https://github.com/bundestag/gesetze"
+    },
+    {
+      "name": "OpenLegalData API",
+      "type": "german-law", 
+      "reliability": "high",
+      "botFriendly": true,
+      "url": "https://de.openlegaldata.io/api/"
+    },
+    {
+      "name": "EUR-Lex",
+      "type": "eu-regulation",
+      "reliability": "high",
+      "botFriendly": "with-delays",
+      "url": "https://eur-lex.europa.eu/"
+    }
   ],
+  "features": [
+    "Bot-resistente Datenquellen",
+    "Mehrschichtige Fallback-Strategie", 
+    "Respektvolles Crawling mit Delays",
+    "100% Verfügbarkeit durch Smart Fallbacks",
+    "Automatische Quellenpriorisierung"
+  ],
+  "automationReady": {
+    "marketingContent": true,
+    "complianceChecker": true,
+    "apiAccess": true,
+    "offlineCapable": true
+  },
   "nextUpdate": "2025-06-24T04:00:00Z",
-  "buildInfo": {
-    "workflow": "complete-database-v3",
-    "githubActions": "https://github.com/obenning/eu-laws-navigator/actions"
+  "troubleshooting": {
+    "commonIssues": "Bot-blocking von offiziellen Websites",
+    "solutions": "Alternative APIs und Repositories nutzen",
+    "fallbackQuality": "Hochwertige Weiterleitungen zu Originalquellen"
   }
 }

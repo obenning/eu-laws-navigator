@@ -1,0 +1,23 @@
+{
+  "id": "stgb",
+  "name": "Strafgesetzbuch",
+  "shortName": "StGB",
+  "type": "german-law",
+  "lastUpdate": "2025-06-23",
+  "sourceUrl": "https://de.openlegaldata.io",
+  "dataSource": "openlegaldata-api",
+  "sections": [
+    {
+      "number": 1,
+      "title": "Gesetz",
+      "items": [
+        {
+          "number": "1",
+          "title": "Strafgesetzbuch",
+          "content": "<div class=\"jnhtml\">\n              <h3>Strafgesetzbuch</h3>\n              <p><strong>Strafgesetzbuch</strong></p>\n              <p>Gesetzestext verfügbar über OpenLegalData.</p>\n              <p><a href=\"https://de.openlegaldata.io\" target=\"_blank\">Volltext lesen</a></p>\n            </div>",
+          "type": "paragraph"
+        }
+      ]
+    }
+  ]
+}

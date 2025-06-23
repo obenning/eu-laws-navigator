@@ -1,8 +1,11 @@
 {
   "id": "eu_gdpr",
   "name": "EU-Datenschutz-Grundverordnung",
+  "shortName": "DSGVO",
   "type": "eu-regulation",
   "lastUpdate": "2025-06-23",
+  "sourceUrl": "https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679",
+  "dataSource": "eur-lex",
   "sections": [
     {
       "number": 1,
@@ -10,8 +13,8 @@
       "items": [
         {
           "number": "1",
-          "title": "Gegenstand und Anwendungsbereich",
-          "content": "<div class=\"eu-article\">\n            <h3>Artikel 1 - Gegenstand und Anwendungsbereich</h3>\n            <p><strong>EU-Datenschutz-Grundverordnung</strong></p>\n            <p>Diese Verordnung legt Vorschriften fest...</p>\n            <p><a href=\"https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679\" target=\"_blank\">Volltext auf EUR-Lex</a></p>\n          </div>",
+          "title": "Volltext auf EUR-Lex",
+          "content": "<div class=\"eu-article\">\n              <h3>EU-Datenschutz-Grundverordnung</h3>\n              <p>Der vollständige Text ist verfügbar unter:</p>\n              <p><a href=\"https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679\" target=\"_blank\">EU-Datenschutz-Grundverordnung auf EUR-Lex lesen</a></p>\n              <p><em>CELEX-Nr.: 32016R0679</em></p>\n            </div>",
           "type": "article"
         }
       ]

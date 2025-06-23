@@ -1,18 +1,26 @@
 {
   "id": "gwg_2017",
-  "name": "Geldwäschegesetz (GwG)", 
+  "name": "Geldwäschegesetz",
   "shortName": "GwG",
   "type": "german-law",
   "lastUpdate": "2025-06-23",
+  "sourceUrl": "https://www.gesetze-im-internet.de/",
+  "dataSource": "smart-fallback",
   "sections": [
     {
       "number": 1,
-      "title": "Gesetz (Weiterleitung)",
+      "title": "Mehrere Quellen verfügbar",
       "items": [
         {
           "number": "1",
-          "title": "Volltext verfügbar",
-          "content": "<div class=\"jnhtml\"><h3>Geldwäschegesetz (GwG)</h3><p>Der vollständige Text ist verfügbar unter:</p><p><a href=\"https://www.gesetze-im-internet.de/gwg_2017/\" target=\"_blank\">Gesetze-im-Internet öffnen</a></p><p><a href=\"https://www.buzer.de/gesetz/gwg_2017/\" target=\"_blank\">Auf Buzer.de durchsuchen</a></p></div>",
+          "title": "Offizielle Quelle",
+          "content": "<div class=\"jnhtml\"><h3>Geldwäschegesetz - Offizielle Quellen</h3><ul><li><a href=\"https://www.gesetze-im-internet.de/\" target=\"_blank\">Gesetze im Internet (BMJ)</a></li><li><a href=\"https://www.buzer.de/\" target=\"_blank\">Buzer.de (durchsuchbar)</a></li><li><a href=\"https://dejure.org/\" target=\"_blank\">dejure.org (mit Kommentaren)</a></li><li><a href=\"https://www.gesetze-bayern.de/\" target=\"_blank\">Gesetze Bayern</a></li></ul></div>",
+          "type": "paragraph"
+        },
+        {
+          "number": "2", 
+          "title": "API-Zugang",
+          "content": "<div class=\"jnhtml\"><h3>Programmatischer Zugang</h3><ul><li><a href=\"https://de.openlegaldata.io/\" target=\"_blank\">OpenLegalData.io API</a></li><li><a href=\"https://github.com/bundestag/gesetze\" target=\"_blank\">Bundestag GitHub Repository</a></li><li><a href=\"https://offenegesetze.de/\" target=\"_blank\">OffeneGesetze.de</a></li></ul></div>",
           "type": "paragraph"
         }
       ]
