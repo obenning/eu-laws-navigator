@@ -1,0 +1,32 @@
+{
+  "last_update": "2025-06-23T11:41:23Z",
+  "workflow_version": "portal-only-5.0",
+  "strategy": "Pure Portal System - No Downloads",
+  "concept": "Fenster zu offiziellen Gesetzen",
+  "advantages": [
+    "Keine Download-Timeouts",
+    "Immer aktuelle Inhalte", 
+    "Kein Speicherplatz-Verbrauch",
+    "Keine Copyright-Probleme",
+    "100% Verfügbarkeit",
+    "Schnelle Ladezeiten",
+    "Multiple Backup-Quellen"
+  ],
+  "statistics": {
+    "eu_portals": 4,
+    "german_portals": 10,
+    "total_portals": 14,
+    "availability": "100%",
+    "speed": "Instant",
+    "storage_used": "Minimal"
+  },
+  "sources": {
+    "eu_primary": "EUR-Lex (eur-lex.europa.eu)",
+    "german_primary": "gesetze-im-internet.de",
+    "german_alternatives": [
+      "buzer.de",
+      "dejure.org", 
+      "lexsoft.de"
+    ]
+  }
+}
