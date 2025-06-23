@@ -2,40 +2,67 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Wertpapierhandelsgesetz (WpHG) - Weiterleitung</title>
+  <title>Wertpapierhandelsgesetz (WpHG) - Offizieller Zugang</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
-    .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .header { background: #1e40af; color: white; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 20px; }
-    .info-box { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 15px; margin: 20px 0; border-radius: 4px; }
-    .warning-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px; }
-    .button { display: inline-block; background: #3b82f6; color: white; padding: 12px 20px; text-decoration: none; border-radius: 6px; margin: 5px; }
-    .button:hover { background: #2563eb; }
-    .button.secondary { background: #6b7280; }
-    .update-info { font-size: 0.9em; color: #666; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd; }
+    body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:800px;margin:0 auto;padding:20px;background:#f8fafc}
+    .container{background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.1);overflow:hidden}
+    .header{background:linear-gradient(135deg,#1e40af,#3b82f6);color:white;padding:30px;text-align:center}
+    .header h1{margin:0;font-size:22px;font-weight:600}
+    .content{padding:25px}
+    .info-box{background:#dbeafe;border-left:4px solid #3b82f6;padding:15px;margin:15px 0;border-radius:6px}
+    .sources{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:20px 0}
+    .source-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:15px;transition:transform .2s}
+    .source-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+    .source-card h3{margin:0 0 8px 0;color:#1e40af;font-size:14px}
+    .source-card p{margin:0 0 10px 0;color:#64748b;font-size:12px;line-height:1.4}
+    .button{display:inline-block;background:#3b82f6;color:white;padding:8px 16px;text-decoration:none;border-radius:6px;font-size:12px;font-weight:500;transition:background .2s}
+    .button:hover{background:#2563eb}
+    .button.secondary{background:#6b7280}
+    .update-info{font-size:12px;color:#64748b;margin-top:20px;padding-top:15px;border-top:1px solid #e2e8f0}
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>Wertpapierhandelsgesetz (WpHG)</h1>
-      <p>Automatische Weiterleitung zu offiziellen Quellen</p>
+      <h1>📜 Wertpapierhandelsgesetz (WpHG)</h1>
+      <p>Direkter Zugang zu offiziellen Quellen</p>
     </div>
-    <div class="info-box">
-      <strong>🤖 Automatische Suche aktiv</strong><br>
-      Dieses Gesetz wird täglich automatisch von offiziellen Quellen abgerufen.
-    </div>
-    <div class="warning-box">
-      <strong>⚡ Sofort verfügbar</strong><br>
-      Für den aktuellen Gesetzestext besuchen Sie die offiziellen Quellen unten.
-    </div>
-    <h3>📚 Offizielle Quellen</h3>
-    <a href="https://www.gesetze-im-internet.de" target="_blank" class="button">🏛️ gesetze-im-internet.de</a>
-    <a href="https://github.com/bundestag/gesetze" target="_blank" class="button secondary">📂 Bundestag GitHub</a>
-    <a href="https://de.openlegaldata.io" target="_blank" class="button secondary">🔓 Open Legal Data</a>
-    <div class="update-info">
-      <strong>🤖 Letzter Versuch:</strong> 2025-06-20 14:52 MEZ<br>
-      <strong>🔄 Nächster Versuch:</strong> Morgen um 6:00 Uhr MEZ
+    <div class="content">
+      <div class="info-box">
+        <strong>🤖 Automatische Suche aktiv</strong><br>
+        Volltext sofort über offizielle Quellen verfügbar.
+      </div>
+      
+      <div class="sources">
+        <div class="source-card">
+          <h3>🏛️ gesetze-im-internet.de</h3>
+          <p>Bundesjustizministerium - Aktuelle Fassungen</p>
+          <a href="https://www.gesetze-im-internet.de" target="_blank" class="button">Gesetz finden</a>
+        </div>
+        
+        <div class="source-card">
+          <h3>📂 Bundestag GitHub</h3>
+          <p>Maschinenlesbare Versionen</p>
+          <a href="https://github.com/bundestag/gesetze" target="_blank" class="button secondary">Repository</a>
+        </div>
+        
+        <div class="source-card">
+          <h3>🔓 Open Legal Data</h3>
+          <p>API-Zugang zu 57.000+ Gesetzen</p>
+          <a href="https://de.openlegaldata.io" target="_blank" class="button secondary">API nutzen</a>
+        </div>
+        
+        <div class="source-card">
+          <h3>📋 OffeneGesetze.de</h3>
+          <p>Durchsuchbare Sammlung</p>
+          <a href="https://offenegesetze.de" target="_blank" class="button secondary">Durchsuchen</a>
+        </div>
+      </div>
+      
+      <div class="update-info">
+        <strong>🤖 Letzter Abruf:</strong> 2025-06-23 10:50 MEZ<br>
+        <strong>📊 Status:</strong> Enhanced Redirect - Sofortiger Zugang verfügbar
+      </div>
     </div>
   </div>
 </body>
