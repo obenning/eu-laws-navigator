@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gesetzes-Navigator - Web-App</title>
+    <title>📚 Gesetzes-Navigator - Vollständige Sammlung</title>
+    <meta name="description" content="Durchsuchbare Sammlung deutscher Gesetze und EU-Verordnungen mit automatischer Zitierung">
+    
     <style>
         *, *::before, *::after {
             box-sizing: border-box;
@@ -333,6 +335,32 @@
             display: none;
         }
 
+        /* EU-Artikel Styling */
+        .eu-article {
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .eu-article h3 {
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+
+        /* Deutsche Paragraphen Styling */
+        .jnhtml {
+            background: #f8fafc;
+            border-left: 4px solid #059669;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .jnhtml h3 {
+            color: #047857;
+            margin-bottom: 10px;
+        }
+
         @media (max-width: 768px) {
             .controls {
                 flex-direction: column;
@@ -363,7 +391,7 @@
 <body>
     <div class="header">
         <h1 class="title">📚 Gesetzes-Navigator</h1>
-        <div class="subtitle">Durchsuchbare Sammlung deutscher und EU-Gesetze</div>
+        <div class="subtitle">Vollständige Sammlung deutscher Gesetze und EU-Verordnungen</div>
     </div>
     
     <div class="offline-notice" id="offline-notice">
@@ -388,7 +416,7 @@
                 <option value="kredwg">Kreditwesengesetz (KWG)</option>
             </optgroup>
             <optgroup label="EU-Verordnungen">
-                <option value="eu_aml_2024">EU-Geldwäscheverordnung 2024 (DE)</option>
+                <option value="eu_aml_2024">EU-Geldwäscheverordnung 2024</option>
                 <option value="eu_ai_act_2024">EU-KI-Verordnung (AI Act)</option>
                 <option value="eu_gdpr">EU-Datenschutz-Grundverordnung (DSGVO)</option>
             </optgroup>
@@ -405,227 +433,17 @@
     </div>
 
     <script>
-        // ===== LOKALE DATEN-ARCHITEKTUR (CORS-frei) =====
+        // ===== GESETZES-NAVIGATOR WEB-APP (CORS-frei) =====
         
         // Basis-Konfiguration 
         const APP_CONFIG = {
-            version: '2.0.0',
-            dataFormat: 'embedded',
+            version: '3.0.0',
+            dataFormat: 'json-database',
             offlineFirst: true
         };
 
-        // Eingebettete Gesetzes-Daten (CORS-frei)
-        const LAWS_DATA = {
-            'gwg_2017': {
-                name: 'Geldwäschegesetz (GwG)',
-                shortName: 'GwG',
-                type: 'german-law',
-                lastUpdate: '2024-12-20',
-                sections: [
-                    {
-                        number: 1,
-                        title: "Begriffsbestimmungen, Verpflichtete und risikobasierter Ansatz",
-                        items: [
-                            {
-                                number: "1",
-                                title: "Anwendungsbereich",
-                                content: `<div class="jnhtml">
-<p>(1) Dieses Gesetz ist anzuwenden auf</p>
-<dl>
-<dt>1.</dt><dd>Kreditinstitute,</dd>
-<dt>2.</dt><dd>Finanzdienstleistungsinstitute,</dd>
-<dt>3.</dt><dd>Zahlungsinstitute und E-Geld-Institute,</dd>
-<dt>4.</dt><dd>Kapitalverwaltungsgesellschaften,</dd>
-<dt>5.</dt><dd>Investment-Kommanditgesellschaften nach dem Kapitalanlagegesetzbuch,</dd>
-<dt>6.</dt><dd>Versicherungsunternehmen,</dd>
-<dt>7.</dt><dd>Versicherungsvermittler und -berater,</dd>
-<dt>8.</dt><dd>Spielbanken,</dd>
-<dt>9.</dt><dd>Veranstalter und Vermittler von Glücksspielen im Internet,</dd>
-<dt>10.</dt><dd>Immobilienmakler,</dd>
-<dt>11.</dt><dd>Rechtsanwälte, Kammerrechtsbeistände, Patentanwälte und Notare,</dd>
-<dt>12.</dt><dd>Steuerberater, Steuerbevollmächtigte, Wirtschaftsprüfer und vereidigte Buchprüfer,</dd>
-<dt>13.</dt><dd>Dienstleister für Gesellschaften oder Trusts,</dd>
-<dt>14.</dt><dd>Güterhändler,</dd>
-<dt>15.</dt><dd>Betreiber von Handelsplattformen für Kryptowerte und Kryptowertpapiere sowie Anbieter von Kryptoverwahrgeschäften,</dd>
-<dt>16.</dt><dd>sonstige Gewerbetreibende, soweit sie Geldwäsche betreiben oder Transaktionen in Höhe von mindestens 10 000 Euro in bar entgegennehmen.</dd>
-</dl>
-<p>(2) Die Vorschriften dieses Gesetzes gelten entsprechend für Zweigniederlassungen und selbständige Zweigstellen von Verpflichteten mit Sitz im Ausland.</p>
-</div>`,
-                                type: 'paragraph'
-                            },
-                            {
-                                number: "2",
-                                title: "Begriffsbestimmungen",
-                                content: `<div class="jnhtml">
-<p>Im Sinne dieses Gesetzes ist</p>
-<dl>
-<dt>1.</dt><dd><strong>Geldwäsche:</strong> die Verschleierung der Herkunft von Vermögensgegenständen, die aus einer Straftat stammen,</dd>
-<dt>2.</dt><dd><strong>Terrorismusfinanzierung:</strong> die Bereitstellung oder Sammlung finanzieller Mittel in dem Wissen oder mit der Absicht, dass sie ganz oder teilweise dazu verwendet werden oder verwendet werden können,
-<dl>
-<dt>a)</dt><dd>eine Tat nach den §§ 129a bis 129f des Strafgesetzbuchs oder nach § 89a des Strafgesetzbuchs zu begehen,</dd>
-<dt>b)</dt><dd>eine andere der in Artikel 1 bis 3 des Rahmenbeschlusses 2002/475/JI des Rates vom 13. Juni 2002 zur Terrorismusbekämpfung aufgeführten Straftaten zu begehen oder</dd>
-<dt>c)</dt><dd>eine terroristische Vereinigung zu unterstützen,</dd>
-</dl></dd>
-<dt>3.</dt><dd><strong>Wirtschaftlich Berechtigter:</strong> die natürliche Person, in deren Eigentum oder unter deren Kontrolle der Vertragspartner letztendlich steht, oder die natürliche Person, auf deren Veranlassung eine Transaktion letztendlich durchgeführt oder eine Geschäftsbeziehung letztendlich begründet wird,</dd>
-<dt>4.</dt><dd><strong>Entsprechende Drittstaaten:</strong> Staaten, die nicht Mitgliedstaaten der Europäischen Union sind und deren Systeme zur Bekämpfung der Geldwäsche und der Terrorismusfinanzierung gleichwertige Anforderungen wie die der Europäischen Union aufweisen.</dd>
-</dl>
-</div>`,
-                                type: 'paragraph'
-                            },
-                            {
-                                number: "3",
-                                title: "Risikobasierter Ansatz",
-                                content: `<div class="jnhtml">
-<p>(1) Die Verpflichteten haben unter Berücksichtigung der von den zuständigen Aufsichtsbehörden erstellten Risikoanalyse angemessene geschäftspolitische Grundsätze, Verfahren und interne Kontrollen zur Verhinderung von Geldwäsche und von Terrorismusfinanzierung zu schaffen und anzuwenden.</p>
-<p>(2) Art und Umfang der zu treffenden Maßnahmen bestimmen sich nach dem jeweiligen Risiko der Geschäftstätigkeit des Verpflichteten im Hinblick auf Geldwäsche und Terrorismusfinanzierung.</p>
-<p>(3) Die Verpflichteten haben ihre Maßnahmen zur Verhinderung von Geldwäsche und von Terrorismusfinanzierung kontinuierlich zu überprüfen und bei Bedarf zu aktualisieren.</p>
-</div>`,
-                                type: 'paragraph'
-                            }
-                        ]
-                    },
-                    {
-                        number: 2,
-                        title: "Sorgfaltspflichten in Bezug auf Kunden",
-                        items: [
-                            {
-                                number: "10",
-                                title: "Allgemeine Sorgfaltspflichten",
-                                content: `<div class="jnhtml">
-<p>(1) Die Verpflichteten haben Sorgfaltspflichten in Bezug auf ihre Kunden zu erfüllen. Zu diesen Sorgfaltspflichten gehören:</p>
-<dl>
-<dt>1.</dt><dd>die Identifizierung des Vertragspartners und die Überprüfung der Identität des Vertragspartners anhand von Dokumenten, Daten oder Informationen aus zuverlässiger und unabhängiger Quelle,</dd>
-<dt>2.</dt><dd>die Identifizierung des wirtschaftlich Berechtigten und die Ergreifung angemessener Maßnahmen zur Überprüfung der Identität des wirtschaftlich Berechtigten,</dd>
-<dt>3.</dt><dd>die Einholung von Informationen über Zweck und angestrebte Art der Geschäftsbeziehung,</dd>
-<dt>4.</dt><dd>die kontinuierliche Überwachung der Geschäftsbeziehung einschließlich der in ihrem Verlauf durchgeführten Transaktionen.</dd>
-</dl>
-<p>(2) Die Sorgfaltspflichten sind zu erfüllen:</p>
-<dl>
-<dt>1.</dt><dd>bei der Begründung einer Geschäftsbeziehung,</dd>
-<dt>2.</dt><dd>bei der Durchführung einer Transaktion außerhalb einer Geschäftsbeziehung, die einen Geldbetrag von 15 000 Euro oder mehr umfasst,</dd>
-<dt>3.</dt><dd>bei Zweifeln an der Echtheit oder Angemessenheit der zuvor erhobenen Angaben zur Identität des Vertragspartners oder des wirtschaftlich Berechtigten,</dd>
-<dt>4.</dt><dd>bei Transaktionen oder Geschäftsbeziehungen mit Personen aus Hochrisikodrittländern.</dd>
-</dl>
-</div>`,
-                                type: 'paragraph'
-                            },
-                            {
-                                number: "11",
-                                title: "Verstärkte Sorgfaltspflichten",
-                                content: `<div class="jnhtml">
-<p>(1) Die Verpflichteten haben über die allgemeinen Sorgfaltspflichten hinaus verstärkte Sorgfaltspflichten zu erfüllen, wenn ein erhöhtes Risiko der Geldwäsche oder der Terrorismusfinanzierung vorliegt.</p>
-<p>(2) Ein erhöhtes Risiko liegt insbesondere vor bei:</p>
-<dl>
-<dt>1.</dt><dd>Transaktionen oder Geschäftsbeziehungen mit politisch exponierten Personen,</dd>
-<dt>2.</dt><dd>Transaktionen oder Geschäftsbeziehungen mit Personen aus geografisch bedingt risikobehafteten Gebieten,</dd>
-<dt>3.</dt><dd>ungewöhnlich komplexen oder außergewöhnlich großvolumigen Transaktionen,</dd>
-<dt>4.</dt><dd>ungewöhnlichen Transaktionsmustern ohne offensichtlichen wirtschaftlichen oder rechtmäßigen Zweck,</dd>
-<dt>5.</dt><dd>Korrespondenzbeziehungen mit Respondenten mit Sitz in Drittstaaten.</dd>
-</dl>
-<p>(3) Zu den verstärkten Sorgfaltspflichten gehören:</p>
-<dl>
-<dt>1.</dt><dd>die Einholung zusätzlicher Informationen über den Kunden,</dd>
-<dt>2.</dt><dd>die Einholung zusätzlicher Informationen über die angestrebte Art der Geschäftsbeziehung,</dd>
-<dt>3.</dt><dd>die Einholung von Informationen über die Herkunft der Vermögenswerte des Kunden,</dd>
-<dt>4.</dt><dd>die Durchführung einer verstärkten kontinuierlichen Überwachung der Geschäftsbeziehung.</dd>
-</dl>
-</div>`,
-                                type: 'paragraph'
-                            }
-                        ]
-                    }
-                ]
-            },
-            'eu_aml_2024': {
-                name: 'EU-Geldwäscheverordnung 2024',
-                shortName: 'EU-GwVO',
-                type: 'eu-regulation',
-                lastUpdate: '2024-12-20',
-                sections: [
-                    {
-                        number: 1,
-                        title: "Allgemeine Bestimmungen",
-                        items: [
-                            {
-                                number: "1",
-                                title: "Gegenstand und Anwendungsbereich",
-                                content: `<div class="eu-article">
-<p>(1) Diese Verordnung legt harmonisierte Vorschriften zur Verhinderung der Nutzung des Finanzsystems der Union für die Zwecke der Geldwäsche und der Terrorismusfinanzierung fest.</p>
-<p>(2) Diese Verordnung gilt für folgende Verpflichtete:</p>
-<ol type="a">
-<li>Kreditinstitute;</li>
-<li>Finanzinstitute;</li>
-<li>Zahlungsdienstleister;</li>
-<li>E-Geld-Institute;</li>
-<li>Verwaltungsgesellschaften;</li>
-<li>Versicherungsunternehmen und -vermittler;</li>
-<li>Anbieter von Dienstleistungen im Zusammenhang mit virtuellen Vermögenswerten;</li>
-<li>Immobilienmakler;</li>
-<li>Rechtsanwälte, Notare und sonstige unabhängige Angehörige der Rechtsberufe;</li>
-<li>Wirtschaftsprüfer, externe Buchprüfer und Steuerberater;</li>
-<li>Anbieter von Treuhand- und Gesellschaftsdienstleistungen;</li>
-<li>Glücksspieldienstleister;</li>
-<li>Händler mit hochwertigen Gütern;</li>
-<li>Anbieter von Crowdfunding-Dienstleistungen.</li>
-</ol>
-</div>`,
-                                type: 'article'
-                            },
-                            {
-                                number: "2",
-                                title: "Begriffsbestimmungen",
-                                content: `<div class="eu-article">
-<p>Für die Zwecke dieser Verordnung bezeichnet der Ausdruck:</p>
-<ol>
-<li><strong>„Geldwäsche"</strong>: die in Artikel 1 der Richtlinie (EU) 2018/1673 genannten Handlungen;</li>
-<li><strong>„Terrorismusfinanzierung"</strong>: die Bereitstellung oder Sammlung von Geldern in der Absicht oder in dem Wissen, dass sie ganz oder teilweise für die Begehung einer der in den Artikeln 1 bis 4 der Richtlinie (EU) 2017/541 aufgeführten Straftaten verwendet werden sollen;</li>
-<li><strong>„Verpflichtete"</strong>: die in Artikel 1 Absatz 2 genannten natürlichen oder juristischen Personen;</li>
-<li><strong>„wirtschaftlich Berechtigter"</strong>: die natürliche Person oder die natürlichen Personen, die letztendlich Eigentümer einer juristischen Person sind oder diese kontrollieren;</li>
-<li><strong>„politisch exponierte Person"</strong>: eine natürliche Person, die wichtige öffentliche Ämter ausübt oder ausgeübt hat;</li>
-<li><strong>„Hochrisikodrittländer"</strong>: Länder, die von der Kommission gemäß Artikel 9 der Richtlinie (EU) 2015/849 ermittelt wurden.</li>
-</ol>
-</div>`,
-                                type: 'article'
-                            }
-                        ]
-                    },
-                    {
-                        number: 2,
-                        title: "Sorgfaltspflichten gegenüber Kunden",
-                        items: [
-                            {
-                                number: "19",
-                                title: "Allgemeine Bestimmungen zur Sorgfaltspflicht gegenüber Kunden",
-                                content: `<div class="eu-article">
-<p>(1) Die Verpflichteten wenden Sorgfaltspflichten gegenüber Kunden in folgenden Fällen an:</p>
-<ol type="a">
-<li>bei der Begründung einer Geschäftsbeziehung;</li>
-<li>bei der Durchführung gelegentlicher Transaktionen
-<ol type="i">
-<li>im Wert von 10 000 EUR oder mehr, unabhängig davon, ob die Transaktion in einem einzigen Vorgang oder in mehreren Vorgängen durchgeführt wird, die miteinander verknüpft zu sein scheinen, oder</li>
-<li>die eine Übertragung von Geldern im Sinne der Verordnung (EU) 2015/847 darstellen;</li>
-</ol>
-</li>
-<li>bei Verdacht auf Geldwäsche oder Terrorismusfinanzierung;</li>
-<li>bei Zweifeln an der Wahrhaftigkeit oder Angemessenheit zuvor erhaltener Kundendaten.</li>
-</ol>
-<p>(2) Die Sorgfaltspflichten gegenüber Kunden umfassen:</p>
-<ol type="a">
-<li>die Identifizierung des Kunden und die Überprüfung der Identität des Kunden;</li>
-<li>die Identifizierung des wirtschaftlich Berechtigten und die Ergreifung angemessener Maßnahmen zur Überprüfung seiner Identität;</li>
-<li>die Bewertung und gegebenenfalls die Einholung von Informationen über den Zweck und die angestrebte Art der Geschäftsbeziehung oder Transaktion;</li>
-<li>die laufende Überwachung der Geschäftsbeziehung.</li>
-</ol>
-</div>`,
-                                type: 'article'
-                            }
-                        ]
-                    }
-                ]
-            }
-        };
-
         // Globale Variablen
+        let LAWS_DATABASE = {};
         let currentLaw = 'gwg_2017';
         let currentSections = [];
         let isLoading = false;
@@ -681,11 +499,185 @@
         }
 
         function updateStats(lawCount = 0, sectionCount = 0) {
-            const lawConfig = LAWS_DATA[currentLaw];
+            const lawConfig = LAWS_DATABASE[currentLaw];
             if (lawConfig) {
                 statsInfo.textContent = `${lawConfig.name} • ${sectionCount} Abschnitte • ${lawCount} ${lawConfig.type === 'eu-regulation' ? 'Artikel' : 'Paragraphen'}`;
                 lastUpdate.textContent = `Letzte Aktualisierung: ${lawConfig.lastUpdate}`;
             }
+        }
+
+        // Lade Gesetzes-Datenbank
+        async function loadLawsDatabase() {
+            showLoading('Lade Gesetzes-Datenbank...');
+            updateStatus('online', 'Lade Datenbank...');
+
+            try {
+                // Versuche Metadaten zu laden
+                const metadataResponse = await fetch('laws/metadata.json');
+                if (metadataResponse.ok) {
+                    const metadata = await metadataResponse.json();
+                    console.log('Metadaten geladen:', metadata);
+                    
+                    const updateDate = new Date(metadata.lastUpdate).toLocaleString('de-DE');
+                    lastUpdate.textContent = `Letzte Aktualisierung: ${updateDate}`;
+                }
+                
+                // Lade alle JSON-Dateien
+                const lawPromises = [
+                    loadLawJSON('gwg_2017'),
+                    loadLawJSON('kredwg'),
+                    loadLawJSON('zag_2018'),
+                    loadLawJSON('awg_2013'),
+                    loadLawJSON('eu_aml_2024'),
+                    loadLawJSON('eu_ai_act_2024'),
+                    loadLawJSON('eu_gdpr')
+                ];
+
+                const results = await Promise.allSettled(lawPromises);
+                let loadedCount = 0;
+
+                results.forEach((result, index) => {
+                    if (result.status === 'fulfilled') {
+                        loadedCount++;
+                    } else {
+                        console.warn(`Gesetz ${index} konnte nicht geladen werden:`, result.reason);
+                    }
+                });
+
+                if (loadedCount > 0) {
+                    console.log(`${loadedCount} von ${lawPromises.length} Gesetzen geladen`);
+                    updateStatus('online', `${loadedCount} Gesetze verfügbar`);
+                    return true;
+                } else {
+                    throw new Error('Keine Gesetze konnten geladen werden');
+                }
+
+            } catch (error) {
+                console.error('Fehler beim Laden der Datenbank:', error);
+                
+                // Fallback: Verwende eingebettete Demo-Daten
+                LAWS_DATABASE = createDemoDatabase();
+                updateStatus('offline', 'Demo-Daten aktiv');
+                return false;
+            }
+        }
+
+        // Lade einzelnes Gesetz von JSON-Datei
+        async function loadLawJSON(lawId) {
+            try {
+                const response = await fetch(`laws/data/${lawId}.json`);
+                if (response.ok) {
+                    const lawData = await response.json();
+                    LAWS_DATABASE[lawId] = lawData;
+                    console.log(`✅ ${lawData.name} geladen`);
+                    return lawData;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.warn(`❌ Fehler beim Laden von ${lawId}:`, error.message);
+                
+                // Fallback für dieses Gesetz
+                LAWS_DATABASE[lawId] = createFallbackLaw(lawId);
+                return LAWS_DATABASE[lawId];
+            }
+        }
+
+        // Erstelle Demo-Datenbank (falls alles fehlschlägt)
+        function createDemoDatabase() {
+            return {
+                'gwg_2017': {
+                    id: 'gwg_2017',
+                    name: 'Geldwäschegesetz (GwG)',
+                    shortName: 'GwG',
+                    type: 'german-law',
+                    lastUpdate: '2024-12-20',
+                    sections: [
+                        {
+                            number: 1,
+                            title: "Demo-Daten",
+                            items: [
+                                {
+                                    number: "1",
+                                    title: "Demo-Modus",
+                                    content: `<div class="jnhtml">
+                                        <h3>Demo-Modus aktiviert</h3>
+                                        <p>Die vollständige Gesetzes-Datenbank wird automatisch vom GitHub Actions Workflow geladen.</p>
+                                        <p>Nach dem ersten Workflow-Lauf stehen alle Gesetze zur Verfügung.</p>
+                                    </div>`,
+                                    type: 'paragraph'
+                                }
+                            ]
+                        }
+                    ]
+                },
+                'eu_aml_2024': {
+                    id: 'eu_aml_2024',
+                    name: 'EU-Geldwäscheverordnung 2024',
+                    shortName: 'EU-GwVO',
+                    type: 'eu-regulation',
+                    lastUpdate: '2024-12-20',
+                    sections: [
+                        {
+                            number: 1,
+                            title: "Demo-Daten",
+                            items: [
+                                {
+                                    number: "1",
+                                    title: "Demo-Artikel",
+                                    content: `<div class="eu-article">
+                                        <h3>Artikel 1 - Demo-Modus</h3>
+                                        <p>EU-Verordnungen werden automatisch von EUR-Lex geladen.</p>
+                                        <p>Nach dem ersten Workflow-Lauf stehen alle EU-Verordnungen zur Verfügung.</p>
+                                    </div>`,
+                                    type: 'article'
+                                }
+                            ]
+                        }
+                    ]
+                }
+            };
+        }
+
+        // Erstelle Fallback für einzelnes Gesetz
+        function createFallbackLaw(lawId) {
+            const lawNames = {
+                'gwg_2017': { name: 'Geldwäschegesetz (GwG)', short: 'GwG', type: 'german-law' },
+                'kredwg': { name: 'Kreditwesengesetz (KWG)', short: 'KWG', type: 'german-law' },
+                'zag_2018': { name: 'Zahlungsdiensteaufsichtsgesetz (ZAG)', short: 'ZAG', type: 'german-law' },
+                'awg_2013': { name: 'Außenwirtschaftsgesetz (AWG)', short: 'AWG', type: 'german-law' },
+                'eu_aml_2024': { name: 'EU-Geldwäscheverordnung 2024', short: 'EU-GwVO', type: 'eu-regulation' },
+                'eu_ai_act_2024': { name: 'EU-KI-Verordnung (AI Act)', short: 'EU-KI-VO', type: 'eu-regulation' },
+                'eu_gdpr': { name: 'EU-Datenschutz-Grundverordnung', short: 'DSGVO', type: 'eu-regulation' }
+            };
+
+            const lawInfo = lawNames[lawId] || { name: 'Unbekanntes Gesetz', short: 'UG', type: 'german-law' };
+
+            return {
+                id: lawId,
+                name: lawInfo.name,
+                shortName: lawInfo.short,
+                type: lawInfo.type,
+                lastUpdate: new Date().toISOString().split('T')[0],
+                sections: [
+                    {
+                        number: 1,
+                        title: "Gesetz wird geladen",
+                        items: [
+                            {
+                                number: "1",
+                                title: "Automatische Aktualisierung",
+                                content: `<div class="${lawInfo.type === 'eu-regulation' ? 'eu-article' : 'jnhtml'}">
+                                    <h3>${lawInfo.name}</h3>
+                                    <p>Dieses Gesetz wird automatisch vom GitHub Actions Workflow geladen.</p>
+                                    <p>Nach dem nächsten Workflow-Lauf (täglich um 6:00 Uhr) steht der vollständige Inhalt zur Verfügung.</p>
+                                </div>`,
+                                type: lawInfo.type === 'eu-regulation' ? 'article' : 'paragraph'
+                            }
+                        ]
+                    }
+                ]
+            };
         }
 
         // Such-Funktionalität
@@ -763,7 +755,7 @@
                 const filteredItems = [];
                 
                 for (const item of section.items) {
-                    const lawConfig = LAWS_DATA[currentLaw];
+                    const lawConfig = LAWS_DATABASE[currentLaw];
                     const searchableTitle = `${lawConfig.type === 'eu-regulation' ? 'Art.' : '§'} ${item.number} ${item.title}`;
                     
                     if (!searchText || matchesSearch(searchableTitle, searchText, lawConfig.type)) {
@@ -792,7 +784,7 @@
                         
                         const titleDiv = document.createElement('div');
                         titleDiv.className = 'paragraph-title';
-                        const lawConfig = LAWS_DATA[currentLaw];
+                        const lawConfig = LAWS_DATABASE[currentLaw];
                         titleDiv.innerHTML = `
                             ${lawConfig.type === 'eu-regulation' ? 'Art.' : '§'} ${item.number} - ${item.title}
                             ${contentMatch ? '<span class="match-indicator">(Treffer im Inhalt)</span>' : ''}
@@ -852,7 +844,7 @@
             const contentDiv = document.createElement('div');
             contentDiv.className = 'paragraph-content';
             
-            // Zeige lokalen Inhalt (CORS-frei!)
+            // Zeige lokalen Inhalt
             let displayContent = item.content;
             
             // Wende Highlighting an
@@ -893,18 +885,18 @@
             renderSections(currentSections, searchText);
         }
 
-        // Gesetz laden (lokale Daten)
+        // Gesetz laden (aus lokaler Datenbank)
         function loadLaw(lawKey) {
             if (isLoading) return;
             
-            showLoading(`Lade ${LAWS_DATA[lawKey].name}...`);
+            showLoading(`Lade ${LAWS_DATABASE[lawKey]?.name || 'Gesetz'}...`);
             
             currentLaw = lawKey;
             
             // Simuliere kurze Ladezeit für bessere UX
             setTimeout(() => {
                 try {
-                    const lawData = LAWS_DATA[lawKey];
+                    const lawData = LAWS_DATABASE[lawKey];
                     
                     if (lawData && lawData.sections) {
                         currentSections = lawData.sections;
@@ -918,7 +910,7 @@
                     }
                 } catch (error) {
                     console.error('Fehler beim Laden des Gesetzes:', error);
-                    showError(`Konnte das ${LAWS_DATA[lawKey].name} nicht laden: ${error.message}`);
+                    showError(`Konnte das Gesetz nicht laden: ${error.message}`);
                     updateStatus('error', 'Fehler beim Laden');
                 } finally {
                     hideLoading();
@@ -950,7 +942,7 @@
             if (!selection.toString().trim()) return;
             
             const selectedText = selection.toString().trim();
-            const lawConfig = LAWS_DATA[currentLaw];
+            const lawConfig = LAWS_DATABASE[currentLaw];
             
             // Finde den Kontext des ausgewählten Texts
             let paragraphNumber = '';
@@ -981,12 +973,15 @@
         });
 
         // Initialisierung
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             updateStatus('online', 'Initialisiere...');
+            
+            // Lade Gesetzes-Datenbank
+            const databaseLoaded = await loadLawsDatabase();
             
             // Letztes ausgewähltes Gesetz wiederherstellen
             const lastLaw = localStorage.getItem('lastSelectedLaw');
-            if (lastLaw && LAWS_DATA[lastLaw]) {
+            if (lastLaw && LAWS_DATABASE[lastLaw]) {
                 currentLaw = lastLaw;
                 lawSelector.value = currentLaw;
             }
@@ -998,6 +993,8 @@
             setTimeout(() => {
                 searchInput.focus();
             }, 500);
+            
+            hideLoading();
         });
     </script>
 </body>
