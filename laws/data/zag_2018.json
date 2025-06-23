@@ -1,0 +1,21 @@
+{
+  "id": "zag_2018",
+  "name": "Zahlungsdiensteaufsichtsgesetz (ZAG)", 
+  "shortName": "ZAG",
+  "type": "german-law",
+  "lastUpdate": "2025-06-23",
+  "sections": [
+    {
+      "number": 1,
+      "title": "Gesetz (Weiterleitung)",
+      "items": [
+        {
+          "number": "1",
+          "title": "Volltext verfügbar",
+          "content": "<div class=\"jnhtml\"><h3>Zahlungsdiensteaufsichtsgesetz (ZAG)</h3><p>Der vollständige Text ist verfügbar unter:</p><p><a href=\"https://www.gesetze-im-internet.de/zag_2018/\" target=\"_blank\">Gesetze-im-Internet öffnen</a></p><p><a href=\"https://www.buzer.de/gesetz/zag_2018/\" target=\"_blank\">Auf Buzer.de durchsuchen</a></p></div>",
+          "type": "paragraph"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "lastUpdate": "2025-06-23T12:11:57Z",
+  "version": "3.0.0",
+  "type": "complete-database",
+  "statistics": {
+    "totalLaws": 7,
+    "totalSections": 7,
+    "totalItems": 7,
+    "byType": {
+      "euRegulations": 3,
+      "germanLaws": 4
+    }
+  },
+  "dataFormat": "embedded-json",
+  "features": [
+    "Volltext-Suche",
+    "Automatische Zitierung", 
+    "Offline-fähig",
+    "CORS-frei",
+    "Responsive Design"
+  ],
+  "nextUpdate": "2025-06-24T04:00:00Z",
+  "buildInfo": {
+    "workflow": "complete-database-v3",
+    "githubActions": "https://github.com/obenning/eu-laws-navigator/actions"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "kredwg",
+  "name": "Kreditwesengesetz (KWG)", 
+  "shortName": "KWG",
+  "type": "german-law",
+  "lastUpdate": "2025-06-23",
+  "sections": [
+    {
+      "number": 1,
+      "title": "Gesetz (Weiterleitung)",
+      "items": [
+        {
+          "number": "1",
+          "title": "Volltext verfügbar",
+          "content": "<div class=\"jnhtml\"><h3>Kreditwesengesetz (KWG)</h3><p>Der vollständige Text ist verfügbar unter:</p><p><a href=\"https://www.gesetze-im-internet.de/kredwg/\" target=\"_blank\">Gesetze-im-Internet öffnen</a></p><p><a href=\"https://www.buzer.de/gesetz/kredwg/\" target=\"_blank\">Auf Buzer.de durchsuchen</a></p></div>",
+          "type": "paragraph"
+        }
+      ]
+    }
+  ]
+}

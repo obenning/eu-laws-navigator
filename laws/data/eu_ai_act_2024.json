@@ -1,0 +1,20 @@
+{
+  "id": "eu_ai_act_2024",
+  "name": "EU-KI-Verordnung (AI Act)",
+  "type": "eu-regulation",
+  "lastUpdate": "2025-06-23",
+  "sections": [
+    {
+      "number": 1,
+      "title": "EU-Verordnung",
+      "items": [
+        {
+          "number": "1",
+          "title": "Gegenstand und Anwendungsbereich",
+          "content": "<div class=\"eu-article\">\n            <h3>Artikel 1 - Gegenstand und Anwendungsbereich</h3>\n            <p><strong>EU-KI-Verordnung (AI Act)</strong></p>\n            <p>Diese Verordnung legt Vorschriften fest...</p>\n            <p><a href=\"https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32024R1689\" target=\"_blank\">Volltext auf EUR-Lex</a></p>\n          </div>",
+          "type": "article"
+        }
+      ]
+    }
+  ]
+}
