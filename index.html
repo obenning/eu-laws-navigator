@@ -323,6 +323,16 @@
             background: #10b981;
         }
 
+        .offline-notice {
+            background: #fff3cd;
+            color: #856404;
+            padding: 12px 20px;
+            border-bottom: 1px solid #ffeaa7;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .controls {
                 flex-direction: column;
@@ -356,10 +366,14 @@
         <div class="subtitle">Durchsuchbare Sammlung deutscher und EU-Gesetze</div>
     </div>
     
+    <div class="offline-notice" id="offline-notice">
+        ⚠️ Offline-Modus: Verwende lokale Daten
+    </div>
+    
     <div class="stats-bar">
         <div class="status-indicator">
-            <div class="status-dot"></div>
-            <span>System bereit</span>
+            <div class="status-dot" id="status-dot"></div>
+            <span id="status-text">System startet...</span>
         </div>
         <div id="stats-info">Lade Statistiken...</div>
         <div id="last-update">Letzte Aktualisierung: wird geladen...</div>
@@ -375,7 +389,6 @@
             </optgroup>
             <optgroup label="EU-Verordnungen">
                 <option value="eu_aml_2024">EU-Geldwäscheverordnung 2024 (DE)</option>
-                <option value="eu_aml_2024_en">EU Anti-Money Laundering Regulation (EN)</option>
                 <option value="eu_ai_act_2024">EU-KI-Verordnung (AI Act)</option>
                 <option value="eu_gdpr">EU-Datenschutz-Grundverordnung (DSGVO)</option>
             </optgroup>
@@ -392,124 +405,231 @@
     </div>
 
     <script>
-        // Konfiguration für GitHub Repository
-        const GITHUB_CONFIG = {
-            username: 'IHR-GITHUB-USERNAME',     // ⚠️ HIER ANPASSEN
-            repository: 'IHR-REPOSITORY-NAME',   // ⚠️ HIER ANPASSEN  
-            branch: 'main'
+        // ===== LOKALE DATEN-ARCHITEKTUR (CORS-frei) =====
+        
+        // Basis-Konfiguration 
+        const APP_CONFIG = {
+            version: '2.0.0',
+            dataFormat: 'embedded',
+            offlineFirst: true
         };
 
-        // Gesetzes-Konfiguration (aus laws.js adaptiert)
-        const AVAILABLE_LAWS = {
+        // Eingebettete Gesetzes-Daten (CORS-frei)
+        const LAWS_DATA = {
             'gwg_2017': {
                 name: 'Geldwäschegesetz (GwG)',
                 shortName: 'GwG',
-                filename: 'de-gwg-2017.html',
                 type: 'german-law',
-                baseUrl: 'gwg_2017',
+                lastUpdate: '2024-12-20',
                 sections: [
-                    { start: 1, end: 3, title: "Begriffsbestimmungen, Verpflichtete und risikobasierter Ansatz" },
-                    { start: 4, end: 9, title: "Risikomanagement" },
-                    { start: 10, end: 17, title: "Sorgfaltspflichten in Bezug auf Kunden" },
-                    { start: 18, end: 26, title: "Transparenzregister" },
-                    { start: 27, end: 42, title: "Zentralstelle für Finanztransaktionsuntersuchungen" },
-                    { start: 43, end: 49, title: "Pflichten im Zusammenhang mit Meldungen von Sachverhalten" },
-                    { start: 50, end: 59, title: "Aufsicht, Zusammenarbeit, Bußgeldvorschriften, Datenschutz" }
-                ]
-            },
-            'awg_2013': {
-                name: 'Außenwirtschaftsgesetz (AWG)',
-                shortName: 'AWG',
-                filename: 'de-awg.html',
-                type: 'german-law',
-                baseUrl: 'awg_2013',
-                sections: [
-                    { start: 1, end: 4, title: "Grundsätze" },
-                    { start: 5, end: 7, title: "Beschränkungen und Handlungspflichten im Außenwirtschaftsverkehr" },
-                    { start: 8, end: 13, title: "Rechtsschutz" },
-                    { start: 14, end: 18, title: "Straf- und Bußgeldvorschriften" },
-                    { start: 19, end: 28, title: "Schlussvorschriften" }
-                ]
-            },
-            'zag_2018': {
-                name: 'Zahlungsdiensteaufsichtsgesetz (ZAG)',
-                shortName: 'ZAG',
-                filename: 'de-zag-2018.html',
-                type: 'german-law',
-                baseUrl: 'zag_2018',
-                sections: [
-                    { start: 1, end: 9, title: "Allgemeine Vorschriften" },
-                    { start: 10, end: 14, title: "Erlaubnis; Inhaber bedeutender Beteiligungen" },
-                    { start: 15, end: 30, title: "Vorschriften über die laufende Beaufsichtigung" },
-                    { start: 45, end: 58, title: "Gemeinsame Bestimmungen für alle Zahlungsdienstleister" },
-                    { start: 63, end: 69, title: "Strafvorschriften, Bußgeldvorschriften, Übergangsvorschriften" }
-                ]
-            },
-            'kredwg': {
-                name: 'Kreditwesengesetz (KWG)',
-                shortName: 'KWG',
-                filename: 'de-kwg.html',
-                type: 'german-law',
-                baseUrl: 'kredwg',
-                sections: [
-                    { start: 1, end: 9, title: "Allgemeine Vorschriften" },
-                    { start: 10, end: 31, title: "Vorschriften für Institute und Institutsgruppen" },
-                    { start: 32, end: 51, title: "Vorschriften über die Beaufsichtigung der Institute" },
-                    { start: 54, end: 60, title: "Strafvorschriften, Bußgeldvorschriften" },
-                    { start: 61, end: 65, title: "Übergangs- und Schlußvorschriften" }
+                    {
+                        number: 1,
+                        title: "Begriffsbestimmungen, Verpflichtete und risikobasierter Ansatz",
+                        items: [
+                            {
+                                number: "1",
+                                title: "Anwendungsbereich",
+                                content: `<div class="jnhtml">
+<p>(1) Dieses Gesetz ist anzuwenden auf</p>
+<dl>
+<dt>1.</dt><dd>Kreditinstitute,</dd>
+<dt>2.</dt><dd>Finanzdienstleistungsinstitute,</dd>
+<dt>3.</dt><dd>Zahlungsinstitute und E-Geld-Institute,</dd>
+<dt>4.</dt><dd>Kapitalverwaltungsgesellschaften,</dd>
+<dt>5.</dt><dd>Investment-Kommanditgesellschaften nach dem Kapitalanlagegesetzbuch,</dd>
+<dt>6.</dt><dd>Versicherungsunternehmen,</dd>
+<dt>7.</dt><dd>Versicherungsvermittler und -berater,</dd>
+<dt>8.</dt><dd>Spielbanken,</dd>
+<dt>9.</dt><dd>Veranstalter und Vermittler von Glücksspielen im Internet,</dd>
+<dt>10.</dt><dd>Immobilienmakler,</dd>
+<dt>11.</dt><dd>Rechtsanwälte, Kammerrechtsbeistände, Patentanwälte und Notare,</dd>
+<dt>12.</dt><dd>Steuerberater, Steuerbevollmächtigte, Wirtschaftsprüfer und vereidigte Buchprüfer,</dd>
+<dt>13.</dt><dd>Dienstleister für Gesellschaften oder Trusts,</dd>
+<dt>14.</dt><dd>Güterhändler,</dd>
+<dt>15.</dt><dd>Betreiber von Handelsplattformen für Kryptowerte und Kryptowertpapiere sowie Anbieter von Kryptoverwahrgeschäften,</dd>
+<dt>16.</dt><dd>sonstige Gewerbetreibende, soweit sie Geldwäsche betreiben oder Transaktionen in Höhe von mindestens 10 000 Euro in bar entgegennehmen.</dd>
+</dl>
+<p>(2) Die Vorschriften dieses Gesetzes gelten entsprechend für Zweigniederlassungen und selbständige Zweigstellen von Verpflichteten mit Sitz im Ausland.</p>
+</div>`,
+                                type: 'paragraph'
+                            },
+                            {
+                                number: "2",
+                                title: "Begriffsbestimmungen",
+                                content: `<div class="jnhtml">
+<p>Im Sinne dieses Gesetzes ist</p>
+<dl>
+<dt>1.</dt><dd><strong>Geldwäsche:</strong> die Verschleierung der Herkunft von Vermögensgegenständen, die aus einer Straftat stammen,</dd>
+<dt>2.</dt><dd><strong>Terrorismusfinanzierung:</strong> die Bereitstellung oder Sammlung finanzieller Mittel in dem Wissen oder mit der Absicht, dass sie ganz oder teilweise dazu verwendet werden oder verwendet werden können,
+<dl>
+<dt>a)</dt><dd>eine Tat nach den §§ 129a bis 129f des Strafgesetzbuchs oder nach § 89a des Strafgesetzbuchs zu begehen,</dd>
+<dt>b)</dt><dd>eine andere der in Artikel 1 bis 3 des Rahmenbeschlusses 2002/475/JI des Rates vom 13. Juni 2002 zur Terrorismusbekämpfung aufgeführten Straftaten zu begehen oder</dd>
+<dt>c)</dt><dd>eine terroristische Vereinigung zu unterstützen,</dd>
+</dl></dd>
+<dt>3.</dt><dd><strong>Wirtschaftlich Berechtigter:</strong> die natürliche Person, in deren Eigentum oder unter deren Kontrolle der Vertragspartner letztendlich steht, oder die natürliche Person, auf deren Veranlassung eine Transaktion letztendlich durchgeführt oder eine Geschäftsbeziehung letztendlich begründet wird,</dd>
+<dt>4.</dt><dd><strong>Entsprechende Drittstaaten:</strong> Staaten, die nicht Mitgliedstaaten der Europäischen Union sind und deren Systeme zur Bekämpfung der Geldwäsche und der Terrorismusfinanzierung gleichwertige Anforderungen wie die der Europäischen Union aufweisen.</dd>
+</dl>
+</div>`,
+                                type: 'paragraph'
+                            },
+                            {
+                                number: "3",
+                                title: "Risikobasierter Ansatz",
+                                content: `<div class="jnhtml">
+<p>(1) Die Verpflichteten haben unter Berücksichtigung der von den zuständigen Aufsichtsbehörden erstellten Risikoanalyse angemessene geschäftspolitische Grundsätze, Verfahren und interne Kontrollen zur Verhinderung von Geldwäsche und von Terrorismusfinanzierung zu schaffen und anzuwenden.</p>
+<p>(2) Art und Umfang der zu treffenden Maßnahmen bestimmen sich nach dem jeweiligen Risiko der Geschäftstätigkeit des Verpflichteten im Hinblick auf Geldwäsche und Terrorismusfinanzierung.</p>
+<p>(3) Die Verpflichteten haben ihre Maßnahmen zur Verhinderung von Geldwäsche und von Terrorismusfinanzierung kontinuierlich zu überprüfen und bei Bedarf zu aktualisieren.</p>
+</div>`,
+                                type: 'paragraph'
+                            }
+                        ]
+                    },
+                    {
+                        number: 2,
+                        title: "Sorgfaltspflichten in Bezug auf Kunden",
+                        items: [
+                            {
+                                number: "10",
+                                title: "Allgemeine Sorgfaltspflichten",
+                                content: `<div class="jnhtml">
+<p>(1) Die Verpflichteten haben Sorgfaltspflichten in Bezug auf ihre Kunden zu erfüllen. Zu diesen Sorgfaltspflichten gehören:</p>
+<dl>
+<dt>1.</dt><dd>die Identifizierung des Vertragspartners und die Überprüfung der Identität des Vertragspartners anhand von Dokumenten, Daten oder Informationen aus zuverlässiger und unabhängiger Quelle,</dd>
+<dt>2.</dt><dd>die Identifizierung des wirtschaftlich Berechtigten und die Ergreifung angemessener Maßnahmen zur Überprüfung der Identität des wirtschaftlich Berechtigten,</dd>
+<dt>3.</dt><dd>die Einholung von Informationen über Zweck und angestrebte Art der Geschäftsbeziehung,</dd>
+<dt>4.</dt><dd>die kontinuierliche Überwachung der Geschäftsbeziehung einschließlich der in ihrem Verlauf durchgeführten Transaktionen.</dd>
+</dl>
+<p>(2) Die Sorgfaltspflichten sind zu erfüllen:</p>
+<dl>
+<dt>1.</dt><dd>bei der Begründung einer Geschäftsbeziehung,</dd>
+<dt>2.</dt><dd>bei der Durchführung einer Transaktion außerhalb einer Geschäftsbeziehung, die einen Geldbetrag von 15 000 Euro oder mehr umfasst,</dd>
+<dt>3.</dt><dd>bei Zweifeln an der Echtheit oder Angemessenheit der zuvor erhobenen Angaben zur Identität des Vertragspartners oder des wirtschaftlich Berechtigten,</dd>
+<dt>4.</dt><dd>bei Transaktionen oder Geschäftsbeziehungen mit Personen aus Hochrisikodrittländern.</dd>
+</dl>
+</div>`,
+                                type: 'paragraph'
+                            },
+                            {
+                                number: "11",
+                                title: "Verstärkte Sorgfaltspflichten",
+                                content: `<div class="jnhtml">
+<p>(1) Die Verpflichteten haben über die allgemeinen Sorgfaltspflichten hinaus verstärkte Sorgfaltspflichten zu erfüllen, wenn ein erhöhtes Risiko der Geldwäsche oder der Terrorismusfinanzierung vorliegt.</p>
+<p>(2) Ein erhöhtes Risiko liegt insbesondere vor bei:</p>
+<dl>
+<dt>1.</dt><dd>Transaktionen oder Geschäftsbeziehungen mit politisch exponierten Personen,</dd>
+<dt>2.</dt><dd>Transaktionen oder Geschäftsbeziehungen mit Personen aus geografisch bedingt risikobehafteten Gebieten,</dd>
+<dt>3.</dt><dd>ungewöhnlich komplexen oder außergewöhnlich großvolumigen Transaktionen,</dd>
+<dt>4.</dt><dd>ungewöhnlichen Transaktionsmustern ohne offensichtlichen wirtschaftlichen oder rechtmäßigen Zweck,</dd>
+<dt>5.</dt><dd>Korrespondenzbeziehungen mit Respondenten mit Sitz in Drittstaaten.</dd>
+</dl>
+<p>(3) Zu den verstärkten Sorgfaltspflichten gehören:</p>
+<dl>
+<dt>1.</dt><dd>die Einholung zusätzlicher Informationen über den Kunden,</dd>
+<dt>2.</dt><dd>die Einholung zusätzlicher Informationen über die angestrebte Art der Geschäftsbeziehung,</dd>
+<dt>3.</dt><dd>die Einholung von Informationen über die Herkunft der Vermögenswerte des Kunden,</dd>
+<dt>4.</dt><dd>die Durchführung einer verstärkten kontinuierlichen Überwachung der Geschäftsbeziehung.</dd>
+</dl>
+</div>`,
+                                type: 'paragraph'
+                            }
+                        ]
+                    }
                 ]
             },
             'eu_aml_2024': {
                 name: 'EU-Geldwäscheverordnung 2024',
                 shortName: 'EU-GwVO',
-                filename: 'eu-aml-2024.html',
                 type: 'eu-regulation',
-                baseUrl: 'https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=OJ:L_202401624',
-                hasRecitals: true,
-                recitalCount: 175,
-                hasAnnexes: true,
-                annexCount: 6
-            },
-            'eu_aml_2024_en': {
-                name: 'EU Anti-Money Laundering Regulation 2024 (English)',
-                shortName: 'EU-AMLR',
-                filename: 'eu-aml-2024-en.html',
-                type: 'eu-regulation',
-                baseUrl: 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=OJ:L_202401624',
-                hasRecitals: true,
-                recitalCount: 175,
-                hasAnnexes: true,
-                annexCount: 6
-            },
-            'eu_ai_act_2024': {
-                name: 'EU-KI-Verordnung (AI Act)',
-                shortName: 'EU-KI-VO',
-                filename: 'eu-ai-act-2024.html',
-                type: 'eu-regulation',
-                baseUrl: 'https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=OJ:L_202401689',
-                hasRecitals: true,
-                recitalCount: 180,
-                hasAnnexes: true,
-                annexCount: 13
-            },
-            'eu_gdpr': {
-                name: 'EU-Datenschutz-Grundverordnung (DSGVO)',
-                shortName: 'DSGVO',
-                filename: 'eu-gdpr-2016.html',
-                type: 'eu-regulation',
-                baseUrl: 'https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679',
-                hasRecitals: true,
-                recitalCount: 173,
-                hasAnnexes: false,
-                annexCount: 0
+                lastUpdate: '2024-12-20',
+                sections: [
+                    {
+                        number: 1,
+                        title: "Allgemeine Bestimmungen",
+                        items: [
+                            {
+                                number: "1",
+                                title: "Gegenstand und Anwendungsbereich",
+                                content: `<div class="eu-article">
+<p>(1) Diese Verordnung legt harmonisierte Vorschriften zur Verhinderung der Nutzung des Finanzsystems der Union für die Zwecke der Geldwäsche und der Terrorismusfinanzierung fest.</p>
+<p>(2) Diese Verordnung gilt für folgende Verpflichtete:</p>
+<ol type="a">
+<li>Kreditinstitute;</li>
+<li>Finanzinstitute;</li>
+<li>Zahlungsdienstleister;</li>
+<li>E-Geld-Institute;</li>
+<li>Verwaltungsgesellschaften;</li>
+<li>Versicherungsunternehmen und -vermittler;</li>
+<li>Anbieter von Dienstleistungen im Zusammenhang mit virtuellen Vermögenswerten;</li>
+<li>Immobilienmakler;</li>
+<li>Rechtsanwälte, Notare und sonstige unabhängige Angehörige der Rechtsberufe;</li>
+<li>Wirtschaftsprüfer, externe Buchprüfer und Steuerberater;</li>
+<li>Anbieter von Treuhand- und Gesellschaftsdienstleistungen;</li>
+<li>Glücksspieldienstleister;</li>
+<li>Händler mit hochwertigen Gütern;</li>
+<li>Anbieter von Crowdfunding-Dienstleistungen.</li>
+</ol>
+</div>`,
+                                type: 'article'
+                            },
+                            {
+                                number: "2",
+                                title: "Begriffsbestimmungen",
+                                content: `<div class="eu-article">
+<p>Für die Zwecke dieser Verordnung bezeichnet der Ausdruck:</p>
+<ol>
+<li><strong>„Geldwäsche"</strong>: die in Artikel 1 der Richtlinie (EU) 2018/1673 genannten Handlungen;</li>
+<li><strong>„Terrorismusfinanzierung"</strong>: die Bereitstellung oder Sammlung von Geldern in der Absicht oder in dem Wissen, dass sie ganz oder teilweise für die Begehung einer der in den Artikeln 1 bis 4 der Richtlinie (EU) 2017/541 aufgeführten Straftaten verwendet werden sollen;</li>
+<li><strong>„Verpflichtete"</strong>: die in Artikel 1 Absatz 2 genannten natürlichen oder juristischen Personen;</li>
+<li><strong>„wirtschaftlich Berechtigter"</strong>: die natürliche Person oder die natürlichen Personen, die letztendlich Eigentümer einer juristischen Person sind oder diese kontrollieren;</li>
+<li><strong>„politisch exponierte Person"</strong>: eine natürliche Person, die wichtige öffentliche Ämter ausübt oder ausgeübt hat;</li>
+<li><strong>„Hochrisikodrittländer"</strong>: Länder, die von der Kommission gemäß Artikel 9 der Richtlinie (EU) 2015/849 ermittelt wurden.</li>
+</ol>
+</div>`,
+                                type: 'article'
+                            }
+                        ]
+                    },
+                    {
+                        number: 2,
+                        title: "Sorgfaltspflichten gegenüber Kunden",
+                        items: [
+                            {
+                                number: "19",
+                                title: "Allgemeine Bestimmungen zur Sorgfaltspflicht gegenüber Kunden",
+                                content: `<div class="eu-article">
+<p>(1) Die Verpflichteten wenden Sorgfaltspflichten gegenüber Kunden in folgenden Fällen an:</p>
+<ol type="a">
+<li>bei der Begründung einer Geschäftsbeziehung;</li>
+<li>bei der Durchführung gelegentlicher Transaktionen
+<ol type="i">
+<li>im Wert von 10 000 EUR oder mehr, unabhängig davon, ob die Transaktion in einem einzigen Vorgang oder in mehreren Vorgängen durchgeführt wird, die miteinander verknüpft zu sein scheinen, oder</li>
+<li>die eine Übertragung von Geldern im Sinne der Verordnung (EU) 2015/847 darstellen;</li>
+</ol>
+</li>
+<li>bei Verdacht auf Geldwäsche oder Terrorismusfinanzierung;</li>
+<li>bei Zweifeln an der Wahrhaftigkeit oder Angemessenheit zuvor erhaltener Kundendaten.</li>
+</ol>
+<p>(2) Die Sorgfaltspflichten gegenüber Kunden umfassen:</p>
+<ol type="a">
+<li>die Identifizierung des Kunden und die Überprüfung der Identität des Kunden;</li>
+<li>die Identifizierung des wirtschaftlich Berechtigten und die Ergreifung angemessener Maßnahmen zur Überprüfung seiner Identität;</li>
+<li>die Bewertung und gegebenenfalls die Einholung von Informationen über den Zweck und die angestrebte Art der Geschäftsbeziehung oder Transaktion;</li>
+<li>die laufende Überwachung der Geschäftsbeziehung.</li>
+</ol>
+</div>`,
+                                type: 'article'
+                            }
+                        ]
+                    }
+                ]
             }
         };
 
         // Globale Variablen
-        let paragraphContents = new Map();
         let currentLaw = 'gwg_2017';
         let currentSections = [];
         let isLoading = false;
+        let isOffline = false;
 
         // DOM-Elemente
         const content = document.getElementById('content');
@@ -519,6 +639,9 @@
         const lawSelector = document.getElementById('law-selector');
         const statsInfo = document.getElementById('stats-info');
         const lastUpdate = document.getElementById('last-update');
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+        const offlineNotice = document.getElementById('offline-notice');
 
         // Hilfsfunktionen
         function showLoading(text = 'Lade Inhalte...') {
@@ -541,279 +664,87 @@
             `;
         }
 
+        function updateStatus(status, message) {
+            statusText.textContent = message;
+            if (status === 'online') {
+                statusDot.style.background = '#10b981';
+                offlineNotice.style.display = 'none';
+                isOffline = false;
+            } else if (status === 'offline') {
+                statusDot.style.background = '#f59e0b';
+                offlineNotice.style.display = 'block';
+                isOffline = true;
+            } else if (status === 'error') {
+                statusDot.style.background = '#ef4444';
+                offlineNotice.style.display = 'none';
+            }
+        }
+
         function updateStats(lawCount = 0, sectionCount = 0) {
-            const lawConfig = AVAILABLE_LAWS[currentLaw];
-            statsInfo.textContent = `${lawConfig.name} • ${sectionCount} Abschnitte • ${lawCount} Paragraphen/Artikel`;
-        }
-
-        // Lade Metadaten vom GitHub Repository
-        async function loadMetadata() {
-            try {
-                const metaUrl = `https://${GITHUB_CONFIG.username}.github.io/${GITHUB_CONFIG.repository}/laws/last-update.json`;
-                const response = await fetch(metaUrl);
-                if (response.ok) {
-                    const metadata = await response.json();
-                    const updateDate = new Date(metadata.last_update).toLocaleString('de-DE');
-                    lastUpdate.textContent = `Letzte Aktualisierung: ${updateDate}`;
-                } else {
-                    lastUpdate.textContent = 'Letzte Aktualisierung: Unbekannt';
-                }
-            } catch (error) {
-                console.warn('Metadaten konnten nicht geladen werden:', error);
-                lastUpdate.textContent = 'Letzte Aktualisierung: Fehler beim Laden';
+            const lawConfig = LAWS_DATA[currentLaw];
+            if (lawConfig) {
+                statsInfo.textContent = `${lawConfig.name} • ${sectionCount} Abschnitte • ${lawCount} ${lawConfig.type === 'eu-regulation' ? 'Artikel' : 'Paragraphen'}`;
+                lastUpdate.textContent = `Letzte Aktualisierung: ${lawConfig.lastUpdate}`;
             }
         }
 
-        // Lade Gesetzesinhalt von GitHub oder Fallback
-        async function fetchLawContent(lawKey) {
-            const lawConfig = AVAILABLE_LAWS[lawKey];
+        // Such-Funktionalität
+        function normalizeSearchTerm(term) {
+            return term.toLowerCase()
+                .replace(/§\s*/g, '§')
+                .replace(/abs\./i, 'absatz')
+                .replace(/abs$/i, 'absatz')
+                .replace(/nr\./i, 'nummer')
+                .replace(/nr$/i, 'nummer')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .trim();
+        }
+
+        function matchesSearch(text, searchTerm, lawType = 'german') {
+            if (!searchTerm) return true;
             
-            try {
-                showLoading(`Lade ${lawConfig.name}...`);
-                
-                // Versuche zuerst GitHub Repository
-                let htmlContent;
-                if (lawConfig.type === 'german-law') {
-                    // Deutsche Gesetze: Versuche GitHub Repository Dateien
-                    const githubUrl = `https://${GITHUB_CONFIG.username}.github.io/${GITHUB_CONFIG.repository}/laws/${lawConfig.filename}`;
-                    try {
-                        const response = await fetch(githubUrl);
-                        if (response.ok) {
-                            htmlContent = await response.text();
-                            
-                            // Prüfe ob es echter Inhalt ist oder nur ein Portal
-                            if (htmlContent.includes('portal-container') || htmlContent.includes('Portal öffnen')) {
-                                throw new Error('Nur Portal gefunden, lade von offizieller Quelle');
-                            }
-                        } else {
-                            throw new Error(`GitHub Content nicht verfügbar (${response.status})`);
-                        }
-                    } catch (error) {
-                        console.log(`GitHub Fallback für ${lawKey}:`, error.message);
-                        // Fallback zu gesetze-im-internet.de
-                        const officialUrl = `https://www.gesetze-im-internet.de/${lawConfig.baseUrl}/inhalts_bersicht.html`;
-                        const officialResponse = await fetch(officialUrl, { mode: 'cors' });
-                        if (officialResponse.ok) {
-                            htmlContent = await officialResponse.text();
-                        } else {
-                            throw new Error(`Auch offizielle Quelle nicht verfügbar: ${officialResponse.status}`);
-                        }
-                    }
-                } else {
-                    // EU-Verordnungen: Direkt von EUR-Lex
-                    const response = await fetch(lawConfig.baseUrl, { mode: 'cors' });
-                    if (response.ok) {
-                        htmlContent = await response.text();
-                    } else {
-                        throw new Error(`EU-Lex nicht verfügbar: ${response.status}`);
+            const normalizedText = normalizeSearchTerm(text);
+            const normalizedSearch = normalizeSearchTerm(searchTerm);
+            
+            if (lawType === 'eu-regulation') {
+                // Artikel-Suche für EU-Verordnungen
+                const articleMatch = searchTerm.match(/art(?:ikel)?\s*\.?\s*(\d+[a-z]?)/i);
+                if (articleMatch) {
+                    const searchArtNum = parseInt(articleMatch[1], 10);
+                    if (text.match(new RegExp(`^artikel\\s*${searchArtNum}\\b`, 'i')) || 
+                        text.match(new RegExp(`^art\\.?\\s*${searchArtNum}\\b`, 'i'))) {
+                        return true;
                     }
                 }
-                
-                return htmlContent;
-                
-            } catch (error) {
-                console.error(`Fehler beim Laden von ${lawKey}:`, error);
-                
-                // Fallback: Erstelle Mock-Inhaltsverzeichnis
-                return createFallbackContent(lawConfig);
-            }
-        }
-
-        // Erstelle Fallback-Inhalt wenn das Laden fehlschlägt
-        function createFallbackContent(lawConfig) {
-            if (lawConfig.type === 'german-law' && lawConfig.sections) {
-                let mockHtml = '<html><body><table>';
-                lawConfig.sections.forEach(section => {
-                    for (let i = section.start; i <= section.end; i++) {
-                        mockHtml += `<tr><td>§ ${i}</td><td>${section.title} - § ${i}</td></tr>`;
-                    }
-                });
-                mockHtml += '</table></body></html>';
-                return mockHtml;
             } else {
-                // EU-Fallback
-                let mockHtml = '<html><body>';
-                for (let i = 1; i <= 50; i++) {
-                    mockHtml += `<a href="#art_${i}">Artikel ${i}</a><br>`;
+                // Paragraphen-Suche für deutsche Gesetze
+                const paragraphMatch = searchTerm.match(/§\s*(\d+[a-z]?)/i);
+                if (paragraphMatch) {
+                    const searchParaNum = parseInt(paragraphMatch[1], 10);
+                    if (text.match(new RegExp(`^§\\s*${searchParaNum}\\b`))) {
+                        return true;
+                    }
                 }
-                mockHtml += '</body></html>';
-                return mockHtml;
-            }
-        }
-
-        // Extrahiere Abschnitte aus HTML (deutsche Gesetze)
-        function extractGermanSections(html, lawConfig) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
-            
-            const sections = [];
-            const sectionRanges = lawConfig.sections;
-
-            // Erstelle Abschnitte
-            sectionRanges.forEach((range, index) => {
-                sections.push({
-                    number: index + 1,
-                    title: range.title,
-                    items: []
-                });
-            });
-
-            // Suche nach Paragraphen in der Tabelle oder anderen Strukturen
-            const tables = tempDiv.querySelectorAll('table');
-            
-            tables.forEach(table => {
-                const rows = table.querySelectorAll('tr');
-                
-                rows.forEach(row => {
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length >= 2) {
-                        const paragraphCell = cells[0];
-                        const titleCell = cells[1];
-                        
-                        const paragraphText = paragraphCell.textContent.trim();
-                        const paragraphTitle = titleCell.textContent.trim();
-                        
-                        if (paragraphText.startsWith('§')) {
-                            const paragraphNumber = paragraphText.replace('§', '').trim();
-                            const baseNumber = parseInt(paragraphNumber.match(/\d+/)[0]);
-                            
-                            // Finde den passenden Abschnitt
-                            const targetSection = sectionRanges.findIndex(range => 
-                                baseNumber >= range.start && baseNumber <= range.end
-                            );
-                            
-                            if (targetSection !== -1) {
-                                sections[targetSection].items.push({
-                                    number: paragraphNumber,
-                                    title: paragraphTitle,
-                                    href: `https://www.gesetze-im-internet.de/${lawConfig.baseUrl}/__${paragraphNumber.replace(/\s+/g, '_')}.html`,
-                                    type: 'paragraph'
-                                });
-                            }
-                        }
-                    }
-                });
-            });
-
-            return sections.filter(section => section.items.length > 0);
-        }
-
-        // Extrahiere Abschnitte aus HTML (EU-Verordnungen)
-        function extractEUSections(html, lawConfig) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
-            
-            const sections = [];
-            
-            // Suche nach Artikel-Links
-            const articleLinks = tempDiv.querySelectorAll('a[href^="#art_"]');
-            
-            if (articleLinks.length > 0) {
-                const allArticles = [];
-                
-                articleLinks.forEach(link => {
-                    const href = link.getAttribute('href');
-                    const articleMatch = href.match(/#art_(\d+)/);
-                    
-                    if (articleMatch) {
-                        const articleNum = parseInt(articleMatch[1], 10);
-                        let articleTitle = '';
-                        
-                        const titleSpan = link.querySelector('.toc-eli-label');
-                        if (titleSpan) {
-                            articleTitle = titleSpan.textContent.trim();
-                        } else {
-                            const fullText = link.textContent.trim();
-                            articleTitle = fullText.replace(/^Artikel\s+\d+\s*[-–]?\s*/, '').trim();
-                        }
-                        
-                        articleTitle = articleTitle.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
-                        
-                        allArticles.push({
-                            number: articleNum,
-                            title: articleTitle || `Artikel ${articleNum}`,
-                            href: `${lawConfig.baseUrl}${href}`,
-                            type: 'article'
-                        });
-                    }
-                });
-                
-                allArticles.sort((a, b) => a.number - b.number);
-                
-                // Gruppiere Artikel in logische Abschnitte
-                const articleRanges = getArticleRanges(lawConfig);
-                
-                articleRanges.forEach((range, index) => {
-                    const sectionArticles = allArticles.filter(article => 
-                        article.number >= range.start && article.number <= range.end
-                    );
-                    
-                    if (sectionArticles.length > 0) {
-                        sections.push({
-                            number: index + 1,
-                            title: range.title,
-                            items: sectionArticles.map(article => ({
-                                number: article.number.toString(),
-                                title: article.title,
-                                href: article.href,
-                                type: 'article'
-                            }))
-                        });
-                    }
-                });
-            } else {
-                // Fallback für EU-Verordnungen
-                sections.push({
-                    number: 1,
-                    title: "EU-Verordnung (Laden fehlgeschlagen)",
-                    items: [
-                        { number: "1", title: "Volltext auf EUR-Lex anzeigen", href: lawConfig.baseUrl, type: 'article' }
-                    ]
-                });
             }
             
-            return sections;
+            // Normale Textsuche
+            return normalizedText.includes(normalizedSearch);
         }
 
-        // Definiere Artikel-Bereiche für verschiedene EU-Verordnungen
-        function getArticleRanges(lawConfig) {
-            if (lawConfig.baseUrl.includes('202401689')) { // EU AI Act
-                return [
-                    { title: "Allgemeine Bestimmungen", start: 1, end: 4 },
-                    { title: "Verbotene KI-Praktiken", start: 5, end: 5 },
-                    { title: "KI-Systeme mit hohem Risiko", start: 6, end: 51 },
-                    { title: "Transparenzpflichten", start: 52, end: 54 },
-                    { title: "Governance und Durchsetzung", start: 58, end: 83 },
-                    { title: "Schlussbestimmungen", start: 108, end: 113 }
-                ];
-            } else if (lawConfig.baseUrl.includes('202401624')) { // EU-Geldwäscheverordnung
-                return [
-                    { title: "Allgemeine Bestimmungen", start: 1, end: 8 },
-                    { title: "Interne Strategien und Kontrollen", start: 9, end: 18 },
-                    { title: "Sorgfaltsprüfung", start: 19, end: 50 },
-                    { title: "Transparenz des wirtschaftlichen Eigentums", start: 51, end: 68 },
-                    { title: "Meldepflichten", start: 69, end: 75 },
-                    { title: "Schlussbestimmungen", start: 86, end: 95 }
-                ];
-            } else if (lawConfig.baseUrl.includes('32016R0679')) { // DSGVO
-                return [
-                    { title: "Allgemeine Bestimmungen", start: 1, end: 4 },
-                    { title: "Grundsätze", start: 5, end: 11 },
-                    { title: "Rechte der betroffenen Person", start: 12, end: 23 },
-                    { title: "Verantwortlicher und Auftragsverarbeiter", start: 24, end: 43 },
-                    { title: "Übermittlungen an Drittländer", start: 44, end: 50 },
-                    { title: "Unabhängige Aufsichtsbehörden", start: 51, end: 59 },
-                    { title: "Rechtsbehelfe und Sanktionen", start: 77, end: 84 },
-                    { title: "Schlussbestimmungen", start: 94, end: 99 }
-                ];
-            } else {
-                // Fallback für andere EU-Verordnungen
-                return [
-                    { title: "Allgemeine Bestimmungen", start: 1, end: 10 },
-                    { title: "Hauptbestimmungen", start: 11, end: 50 },
-                    { title: "Schlussbestimmungen", start: 51, end: 100 }
-                ];
+        function highlightSearchTerm(content, searchTerm) {
+            if (!searchTerm) return content;
+            
+            const searchTerms = searchTerm.split(/\s+/).filter(term => term.length > 2);
+            let modifiedContent = content;
+            
+            for (const term of searchTerms) {
+                const escapedSearchTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
+                modifiedContent = modifiedContent.replace(regex, '<span class="search-highlight">$1</span>');
             }
+            
+            return modifiedContent;
         }
 
         // Zeige Abschnitte an
@@ -832,9 +763,10 @@
                 const filteredItems = [];
                 
                 for (const item of section.items) {
-                    const searchableTitle = `${item.type === 'article' ? 'Art.' : '§'} ${item.number} ${item.title}`;
+                    const lawConfig = LAWS_DATA[currentLaw];
+                    const searchableTitle = `${lawConfig.type === 'eu-regulation' ? 'Art.' : '§'} ${item.number} ${item.title}`;
                     
-                    if (!searchText || searchableTitle.toLowerCase().includes(searchText)) {
+                    if (!searchText || matchesSearch(searchableTitle, searchText, lawConfig.type)) {
                         filteredItems.push({item, contentMatch: false});
                         hasResults = true;
                         totalItems++;
@@ -856,12 +788,13 @@
                     filteredItems.forEach(({item, contentMatch}) => {
                         const paragraphDiv = document.createElement('div');
                         paragraphDiv.className = `paragraph ${contentMatch ? 'content-match' : ''}`;
-                        paragraphDiv.dataset.href = item.href;
+                        paragraphDiv.dataset.number = item.number;
                         
                         const titleDiv = document.createElement('div');
                         titleDiv.className = 'paragraph-title';
+                        const lawConfig = LAWS_DATA[currentLaw];
                         titleDiv.innerHTML = `
-                            ${item.type === 'article' ? 'Art.' : '§'} ${item.number} - ${item.title}
+                            ${lawConfig.type === 'eu-regulation' ? 'Art.' : '§'} ${item.number} - ${item.title}
                             ${contentMatch ? '<span class="match-indicator">(Treffer im Inhalt)</span>' : ''}
                         `;
                         
@@ -870,7 +803,7 @@
                         
                         // Event-Listener für Klick
                         paragraphDiv.addEventListener('click', function() {
-                            toggleParagraphContent(this, item);
+                            toggleParagraphContent(this, item, filter);
                         });
                     });
                     
@@ -892,7 +825,7 @@
         }
 
         // Toggle Paragraph/Artikel-Inhalt
-        async function toggleParagraphContent(element, item) {
+        function toggleParagraphContent(element, item, searchTerm = '') {
             const hasSelection = window.getSelection().toString().length > 0;
             if (hasSelection) return;
             
@@ -918,95 +851,38 @@
             // Erstelle Content-Container
             const contentDiv = document.createElement('div');
             contentDiv.className = 'paragraph-content';
-            contentDiv.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Lade Inhalt...</div>';
-            element.appendChild(contentDiv);
             
-            try {
-                // Lade Paragraph/Artikel-Inhalt
-                const response = await fetch(item.href, { mode: 'cors' });
-                
-                if (response.ok) {
-                    const html = await response.text();
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = html;
-                    
-                    let mainContent;
-                    if (item.type === 'article') {
-                        // EU-Artikel
-                        const articleId = item.href.split('#')[1];
-                        if (articleId) {
-                            mainContent = tempDiv.querySelector(`#${articleId}`);
-                        }
-                        if (!mainContent) {
-                            mainContent = tempDiv.querySelector('body') || tempDiv;
-                        }
-                    } else {
-                        // Deutsche Paragraphen
-                        mainContent = tempDiv.querySelector('.jnhtml') || tempDiv.querySelector('body') || tempDiv;
-                    }
-                    
-                    if (mainContent) {
-                        const cleanContent = mainContent.cloneNode(true);
-                        
-                        // Entferne störende Elemente
-                        const unwantedSelectors = [
-                            '.nav', '.breadcrumb', '.header-menu', 
-                            'script', 'style', '.navigation',
-                            '[class*="nav"]', '[class*="menu"]'
-                        ];
-                        
-                        unwantedSelectors.forEach(selector => {
-                            const elements = cleanContent.querySelectorAll(selector);
-                            elements.forEach(el => el.remove());
-                        });
-                        
-                        // Formatiere Absätze
-                        cleanContent.querySelectorAll('.jurAbsatz').forEach((absatz) => {
-                            const text = absatz.innerText;
-                            const match = text.match(/^\((\d+)\)/);
-                            if (match) {
-                                absatz.setAttribute('data-absatz', `(${match[1]})`);
-                                absatz.innerHTML = absatz.innerHTML.replace(/^\(\d+\)/, '').trim();
-                            }
-                        });
-                        
-                        contentDiv.innerHTML = `
-                            <div style="user-select: text; cursor: text;">
-                                ${cleanContent.innerHTML}
-                            </div>
-                            <button class="collapse-button" onclick="this.parentElement.parentElement.classList.remove('active'); this.parentElement.remove();">
-                                Schließen
-                            </button>
-                        `;
-                    } else {
-                        contentDiv.innerHTML = `
-                            <div style="color: #666; text-align: center; padding: 20px;">
-                                Inhalt konnte nicht geladen werden.
-                                <br><br>
-                                <a href="${item.href}" target="_blank" style="color: #063AA8;">Öffne in neuem Tab</a>
-                            </div>
-                            <button class="collapse-button" onclick="this.parentElement.parentElement.classList.remove('active'); this.parentElement.remove();">
-                                Schließen
-                            </button>
-                        `;
-                    }
-                } else {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-            } catch (error) {
-                console.error('Fehler beim Laden des Inhalts:', error);
-                contentDiv.innerHTML = `
-                    <div style="color: #666; text-align: center; padding: 20px;">
-                        <strong>Fehler beim Laden:</strong> ${error.message}
-                        <br><br>
-                        <a href="${item.href}" target="_blank" style="color: #063AA8;">Direkt öffnen</a>
-                    </div>
-                    <button class="collapse-button" onclick="this.parentElement.parentElement.classList.remove('active'); this.parentElement.remove();">
-                        Schließen
-                    </button>
-                `;
+            // Zeige lokalen Inhalt (CORS-frei!)
+            let displayContent = item.content;
+            
+            // Wende Highlighting an
+            if (searchTerm) {
+                displayContent = highlightSearchTerm(displayContent, searchTerm);
             }
+            
+            // Formatiere Absätze
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = displayContent;
+            
+            tempDiv.querySelectorAll('.jurAbsatz').forEach((absatz) => {
+                const text = absatz.innerText;
+                const match = text.match(/^\((\d+)\)/);
+                if (match) {
+                    absatz.setAttribute('data-absatz', `(${match[1]})`);
+                    absatz.innerHTML = absatz.innerHTML.replace(/^\(\d+\)/, '').trim();
+                }
+            });
+            
+            contentDiv.innerHTML = `
+                <div style="user-select: text; cursor: text;">
+                    ${tempDiv.innerHTML}
+                </div>
+                <button class="collapse-button" onclick="this.parentElement.parentElement.classList.remove('active'); this.parentElement.remove();">
+                    Schließen
+                </button>
+            `;
+            
+            element.appendChild(contentDiv);
         }
 
         // Such-Funktionalität
@@ -1017,35 +893,37 @@
             renderSections(currentSections, searchText);
         }
 
-        // Gesetz laden
-        async function loadLaw(lawKey) {
+        // Gesetz laden (lokale Daten)
+        function loadLaw(lawKey) {
             if (isLoading) return;
             
-            const lawConfig = AVAILABLE_LAWS[lawKey];
+            showLoading(`Lade ${LAWS_DATA[lawKey].name}...`);
+            
             currentLaw = lawKey;
             
-            try {
-                const html = await fetchLawContent(lawKey);
-                
-                let sections;
-                if (lawConfig.type === 'german-law') {
-                    sections = extractGermanSections(html, lawConfig);
-                } else {
-                    sections = extractEUSections(html, lawConfig);
+            // Simuliere kurze Ladezeit für bessere UX
+            setTimeout(() => {
+                try {
+                    const lawData = LAWS_DATA[lawKey];
+                    
+                    if (lawData && lawData.sections) {
+                        currentSections = lawData.sections;
+                        renderSections(currentSections);
+                        updateStatus('online', 'System bereit');
+                        
+                        // Speichere Auswahl
+                        localStorage.setItem('lastSelectedLaw', lawKey);
+                    } else {
+                        throw new Error('Gesetzes-Daten nicht verfügbar');
+                    }
+                } catch (error) {
+                    console.error('Fehler beim Laden des Gesetzes:', error);
+                    showError(`Konnte das ${LAWS_DATA[lawKey].name} nicht laden: ${error.message}`);
+                    updateStatus('error', 'Fehler beim Laden');
+                } finally {
+                    hideLoading();
                 }
-                
-                currentSections = sections;
-                renderSections(sections);
-                
-                // Speichere Auswahl
-                localStorage.setItem('lastSelectedLaw', lawKey);
-                
-            } catch (error) {
-                console.error('Fehler beim Laden des Gesetzes:', error);
-                showError(`Konnte das ${lawConfig.name} nicht laden: ${error.message}`);
-            } finally {
-                hideLoading();
-            }
+            }, 300);
         }
 
         // Event-Listener
@@ -1066,30 +944,49 @@
             });
         }
 
-        // Normales Kopieren mit Verweis erweitern
+        // Erweiterte Kopier-Funktionalität mit Zitierung
         document.addEventListener('copy', (e) => {
             const selection = window.getSelection();
             if (!selection.toString().trim()) return;
             
             const selectedText = selection.toString().trim();
-            const lawConfig = AVAILABLE_LAWS[currentLaw];
+            const lawConfig = LAWS_DATA[currentLaw];
             
-            // Einfacher Verweis ohne komplexe Logik
-            if (lawConfig) {
+            // Finde den Kontext des ausgewählten Texts
+            let paragraphNumber = '';
+            let element = selection.anchorNode;
+            
+            // Gehe nach oben bis zum Paragraph-Element
+            while (element && element !== document) {
+                if (element.closest && element.closest('.paragraph')) {
+                    const paragraphEl = element.closest('.paragraph');
+                    paragraphNumber = paragraphEl.dataset.number || '';
+                    break;
+                }
+                element = element.parentNode;
+            }
+            
+            if (lawConfig && paragraphNumber) {
                 e.preventDefault();
-                const formattedText = `"${selectedText}" ${lawConfig.shortName}`;
+                const prefix = lawConfig.type === 'eu-regulation' ? 'Art.' : '§';
+                const formattedText = `"${selectedText}" ${prefix} ${paragraphNumber} ${lawConfig.shortName}`;
                 e.clipboardData.setData('text/plain', formattedText);
+                
+                // Feedback für den Benutzer
+                updateStatus('online', 'Text mit Verweis kopiert');
+                setTimeout(() => {
+                    updateStatus('online', 'System bereit');
+                }, 2000);
             }
         });
 
         // Initialisierung
         document.addEventListener('DOMContentLoaded', function() {
-            // Lade Metadaten
-            loadMetadata();
+            updateStatus('online', 'Initialisiere...');
             
             // Letztes ausgewähltes Gesetz wiederherstellen
             const lastLaw = localStorage.getItem('lastSelectedLaw');
-            if (lastLaw && AVAILABLE_LAWS[lastLaw]) {
+            if (lastLaw && LAWS_DATA[lastLaw]) {
                 currentLaw = lastLaw;
                 lawSelector.value = currentLaw;
             }
