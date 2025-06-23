@@ -1,13 +1,14 @@
 {
-  "last_update": "2025-06-23T10:50:57Z",
-  "workflow_version": "2.1-corrected-paths",
-  "success_strategy": "Realistic Bundestag Paths + Enhanced Redirects",
+  "last_update": "2025-06-23T11:53:53Z",
+  "workflow_version": "2.1-corrected-real-content",
+  "success_strategy": "Multi-Source + Enhanced Redirects",
   "statistics": {
     "eu_laws": {
-      "available": 4,
-      "total": 4,
-      "success_rate": "100%",
-      "source": "EUR-Lex (very reliable)"
+      "real_content": 4,
+      "fallbacks": 1,
+      "total": 5,
+      "success_rate": "80%",
+      "source": "EUR-Lex (sehr zuverlässig)"
     },
     "german_laws": {
       "real_content": 0,
@@ -15,15 +16,16 @@
       "total": 10,
       "real_content_rate": "0%",
       "total_available_rate": "100%",
-      "sources": ["Bundestag GitHub (limited)", "Enhanced Redirects (guaranteed)"]
+      "sources": ["Bundestag GitHub", "Open Legal Data", "Enhanced Redirects"]
     },
     "overall": {
-      "total_laws": 14,
-      "fully_available": 14,
+      "real_content": 4,
+      "enhanced_redirects": 11,
+      "total_laws": 15,
+      "real_content_rate": "26%",
       "availability_rate": "100%"
     }
   },
-  "bundestag_status": "Paths tested - most require enhanced redirects due to repository structure",
   "next_update": "2025-06-24T04:00:00Z",
   "github_actions_url": "https://github.com/obenning/eu-laws-navigator/actions"
 }

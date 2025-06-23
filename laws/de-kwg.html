@@ -3,136 +3,112 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kreditwesengesetz (KWG) - Deutsches Portal</title>
+  <title>Kreditwesengesetz (KWG) - Intelligente Weiterleitung</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; 
-      background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
     }
-    .portal-container { 
-      background: white; 
-      border-radius: 16px; 
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-      max-width: 650px; 
-      width: 100%; 
-      overflow: hidden;
+    .container { 
+      background: white; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      max-width: 600px; width: 100%; padding: 40px; text-align: center;
     }
-    .portal-header { 
-      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); 
-      color: white; 
-      padding: 40px 30px; 
-      text-align: center; 
+    .icon { font-size: 4rem; margin-bottom: 20px; }
+    h1 { color: #1e40af; margin-bottom: 10px; font-size: 1.8rem; }
+    .subtitle { color: #64748b; margin-bottom: 30px; font-size: 1.1rem; }
+    .message { 
+      background: #f0f9ff; padding: 20px; border-radius: 12px; margin: 20px 0;
+      border-left: 4px solid #3b82f6; text-align: left; line-height: 1.6;
     }
-    .portal-header h1 { font-size: 28px; margin-bottom: 8px; }
-    .portal-header .subtitle { font-size: 16px; opacity: 0.9; margin-bottom: 4px; }
-    .portal-header .description { font-size: 14px; opacity: 0.8; }
-    .portal-content { padding: 30px; }
-    .portal-links { display: grid; gap: 12px; margin: 20px 0; }
-    .portal-link { 
-      display: flex; 
-      align-items: center; 
-      padding: 16px 20px; 
-      background: #f8fafc; 
-      border: 2px solid #e2e8f0; 
-      border-radius: 12px; 
-      text-decoration: none; 
-      color: #1e40af; 
-      font-weight: 500; 
-      transition: all 0.3s ease;
+    .links { display: grid; gap: 12px; margin: 30px 0; }
+    .link { 
+      display: flex; align-items: center; padding: 16px 20px; background: #f8fafc;
+      border: 2px solid #e2e8f0; border-radius: 12px; text-decoration: none;
+      color: #1e40af; font-weight: 500; transition: all 0.3s ease;
     }
-    .portal-link:hover { 
-      background: #e6f3ff; 
-      border-color: #3b82f6; 
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    .link:hover { 
+      background: #e6f3ff; border-color: #3b82f6; transform: translateY(-2px);
     }
-    .portal-link.primary { 
-      background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); 
-      color: white; 
-      border-color: #3b82f6; 
+    .link.primary { 
+      background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+      color: white; border-color: #3b82f6;
     }
-    .portal-link.primary:hover { 
-      background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); 
-    }
-    .portal-link .icon { 
-      font-size: 20px; 
-      margin-right: 12px; 
-      width: 24px;
-      text-align: center;
-    }
-    .portal-meta { 
-      background: #f1f5f9; 
-      padding: 20px; 
-      border-radius: 12px; 
-      margin-top: 20px; 
-      font-size: 14px; 
-      color: #64748b;
-    }
-    .portal-meta strong { color: #334155; }
-    .portal-badge { 
-      display: inline-block; 
-      background: #ef4444; 
-      color: white; 
-      padding: 4px 12px; 
-      border-radius: 20px; 
-      font-size: 12px; 
-      font-weight: 600; 
-      margin-bottom: 10px;
-    }
-    @media (max-width: 640px) {
-      .portal-header { padding: 30px 20px; }
-      .portal-header h1 { font-size: 24px; }
-      .portal-content { padding: 20px; }
+    .link .icon { font-size: 1.2rem; margin-right: 12px; margin-bottom: 0; }
+    .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;
+      font-size: 0.9rem; color: #64748b;
     }
   </style>
+  <script>
+    // Intelligente Auto-Weiterleitung nach 5 Sekunden zur besten Quelle
+    setTimeout(function() {
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isMobile = /mobile|android|iphone|ipad/.test(userAgent);
+      
+      // Wähle beste Quelle basierend auf Gerät
+      if (isMobile) {
+        window.location.href = 'https://www.gesetze-im-internet.de/kredwg/';
+      } else {
+        window.location.href = 'https://www.buzer.de/gesetz/kredwg/';
+      }
+    }, 5000);
+    
+    // Zeige Countdown
+    let countdown = 5;
+    function updateCountdown() {
+      const element = document.getElementById('countdown');
+      if (element) {
+        element.textContent = countdown;
+        countdown--;
+        if (countdown >= 0) {
+          setTimeout(updateCountdown, 1000);
+        }
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      updateCountdown();
+    });
+  </script>
 </head>
 <body>
-  <div class="portal-container">
-    <div class="portal-header">
-      <div class="portal-badge">🏛️ Deutsches Gesetz</div>
-      <h1>Kreditwesengesetz (KWG)</h1>
-      <div class="subtitle">Gesetz über das Kreditwesen</div>
-      <div class="description">Direktzugang zum offiziellen deutschen Gesetz</div>
+  <div class="container">
+    <div class="icon">⚖️</div>
+    <h1>Kreditwesengesetz (KWG)</h1>
+    <div class="subtitle">Automatische Weiterleitung zu offiziellen Quellen</div>
+    
+    <div class="message">
+      <strong>🔄 Automatische Weiterleitung in <span id="countdown">5</span> Sekunden</strong><br>
+      Sie werden automatisch zur besten verfügbaren Quelle weitergeleitet.
+      Klicken Sie unten für sofortigen Zugriff.
     </div>
     
-    <div class="portal-content">
-      <div class="portal-links">
-        <a href="https://www.gesetze-im-internet.de/kredwg/BJNR141110961.html" target="_blank" class="portal-link primary">
-          <span class="icon">📄</span>
-          <span>Volltext auf gesetze-im-internet.de</span>
-        </a>
-        <a href="https://www.gesetze-im-internet.de/kredwg/" target="_blank" class="portal-link">
-          <span class="icon">📑</span>
-          <span>Inhaltsverzeichnis anzeigen</span>
-        </a>
-        <a href="https://www.buzer.de/gesetz/kredwg/" target="_blank" class="portal-link">
-          <span class="icon">🔍</span>
-          <span>Auf buzer.de durchsuchen</span>
-        </a>
-        <a href="https://dejure.org/gesetze/KREDWG/" target="_blank" class="portal-link">
-          <span class="icon">⚖️</span>
-          <span>Auf dejure.org öffnen</span>
-        </a>
-        <a href="https://www.lexsoft.de/cgi-bin/lexsoft/justizportal_nrw.cgi?t=163238398&xid=bjnr141110961" target="_blank" class="portal-link">
-          <span class="icon">📚</span>
-          <span>Auf lexsoft.de</span>
-        </a>
-      </div>
-      
-      <div class="portal-meta">
-        <p><strong>Gesetz-ID:</strong> kredwg</p>
-        <p><strong>BJNR-Nummer:</strong> BJNR141110961</p>
-        <p><strong>Hauptquelle:</strong> gesetze-im-internet.de (Bundesministerium der Justiz)</p>
-        <p><strong>Alternative Quellen:</strong> buzer.de, dejure.org, lexsoft.de</p>
-        <p><strong>Aktualisierung:</strong> Immer aktuell durch direkten Zugriff</p>
-        <p><strong>Letztes Portal-Update:</strong> 23.06.2025 11:52</p>
-      </div>
+    <div class="links">
+      <a href="https://www.gesetze-im-internet.de/kredwg/" class="link primary">
+        <span class="icon">🏛️</span>
+        <span>Gesetze-im-Internet.de (Offiziell)</span>
+      </a>
+      <a href="https://www.buzer.de/gesetz/kredwg/" class="link">
+        <span class="icon">🔍</span>
+        <span>Buzer.de (Durchsuchbar)</span>
+      </a>
+      <a href="https://dejure.org/gesetze/KREDWG/" class="link">
+        <span class="icon">📚</span>
+        <span>DeJure.org (Kommentiert)</span>
+      </a>
+      <a href="https://www.lexsoft.de/cgi-bin/lexsoft/justizportal_nrw.cgi?xid=kredwg" class="link">
+        <span class="icon">⚖️</span>
+        <span>Lexsoft.de (Rechtsprechung)</span>
+      </a>
+    </div>
+    
+    <div class="footer">
+      <strong>Hinweis:</strong> Diese Weiterleitung erfolgt, da der direkte Download 
+      der Gesetze aus technischen Gründen nicht möglich war. 
+      Sie erhalten Zugang zu den aktuellsten offiziellen Versionen.
+      <br><br>
+      <em>Letztes Update: 23.06.2025 11:52</em>
     </div>
   </div>
 </body>
