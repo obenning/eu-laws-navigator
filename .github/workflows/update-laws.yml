@@ -1,4 +1,4 @@
-name: 📚 Gesetzes-Navigator - Vollständige Daten-Pipeline
+name: 📚 Vereinfachter Gesetzes-Navigator
 
 on:
   schedule:
@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 jobs:
-  build-law-database:
+  build-simple-database:
     runs-on: ubuntu-latest
     
     steps:
@@ -27,401 +27,154 @@ jobs:
       run: |
         mkdir -p laws/data
         mkdir -p laws/raw
-        echo "📁 Verzeichnisse für Gesetzes-Datenbank vorbereitet"
 
-    - name: 🔧 Node.js Prozessor-Skripte erstellen
+    - name: 🏛️ Deutsche Gesetze direkt laden
       run: |
-        # EU-Verordnungen Prozessor
-        cat > process_eu_law.js << 'EUEOF'
-        const fs = require('fs');
+        echo "🔗 Lade deutsche Gesetze direkt von gesetze-im-internet.de..."
         
-        const [lawId, name, rawFile, jsonFile, celex] = process.argv.slice(2);
+        # Definiere Gesetze mit ihren direkten URLs
+        declare -A LAWS=(
+          ["gwg_2017"]="Geldwäschegesetz|GwG|https://www.gesetze-im-internet.de/gwg_2017/BJNR182210017.html"
+          ["kredwg"]="Kreditwesengesetz|KWG|https://www.gesetze-im-internet.de/kredwg/BJNR008010961.html"
+          ["zag_2018"]="Zahlungsdiensteaufsichtsgesetz|ZAG|https://www.gesetze-im-internet.de/zag_2018/BJNR165410009.html"
+          ["awg_2013"]="Außenwirtschaftsgesetz|AWG|https://www.gesetze-im-internet.de/awg_2013/BJNR119410961.html"
+          ["stgb"]="Strafgesetzbuch|StGB|https://www.gesetze-im-internet.de/stgb/BJNR001270871.html"
+          ["vag_2016"]="Versicherungsaufsichtsgesetz|VAG|https://www.gesetze-im-internet.de/vag_2016/BJNR043410015.html"
+        )
         
-        try {
-          const html = fs.readFileSync(rawFile, 'utf8');
+        # Lade jedes Gesetz
+        for law_id in "${!LAWS[@]}"; do
+          IFS='|' read -r name short_name url <<< "${LAWS[$law_id]}"
           
-          const articleData = {
-            id: lawId,
-            name: name,
-            type: 'eu-regulation',
-            lastUpdate: new Date().toISOString().split('T')[0],
-            sections: []
-          };
+          echo "📄 Lade: $name ($short_name)"
+          echo "🔗 URL: $url"
           
-          // Extrahiere Artikel-Links
-          const articleMatches = html.match(/<a[^>]*href="#art_(\d+)"[^>]*>(.*?)<\/a>/g) || [];
+          raw_file="laws/raw/${law_id}.html"
+          json_file="laws/data/${law_id}.json"
           
-          if (articleMatches.length > 0) {
-            console.log(`  📊 ${articleMatches.length} Artikel gefunden`);
+          # Lade HTML direkt
+          if curl -L -A "Mozilla/5.0 (compatible; GesetzeBot/1.0)" \
+               --connect-timeout 30 \
+               --max-time 60 \
+               --retry 3 \
+               --retry-delay 2 \
+               -H "Accept: text/html,application/xhtml+xml" \
+               -H "Accept-Language: de-DE,de;q=0.9" \
+               -o "$raw_file" \
+               "$url"; then
             
-            const articles = articleMatches.slice(0, 20).map((match, index) => {
-              const numberMatch = match.match(/href="#art_(\d+)"/);
-              const number = numberMatch ? numberMatch[1] : (index + 1).toString();
-              
-              // Extrahiere Titel aus dem Link-Text
-              let title = match.replace(/<[^>]*>/g, '').replace(/^\s*Artikel\s*\d+\s*[-–]?\s*/, '').trim();
-              if (!title || title.length < 3) {
-                title = `Artikel ${number}`;
-              }
-              
-              return {
-                number: number,
-                title: title,
-                content: `<div class="eu-article">
-                  <h3>Artikel ${number}</h3>
-                  <p><strong>${title}</strong></p>
-                  <p>Vollständiger Artikel-Text aus ${name}.</p>
-                  <p><em>Bei Bedarf wird der komplette Inhalt von EUR-Lex nachgeladen.</em></p>
-                  <p><a href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:${celex}#art_${number}" target="_blank">Artikel ${number} auf EUR-Lex öffnen</a></p>
-                </div>`,
-                type: 'article'
-              };
-            });
+            # Prüfe Dateigröße
+            size=$(stat -c%s "$raw_file" 2>/dev/null || stat -f%z "$raw_file" 2>/dev/null || echo "0")
             
-            // Gruppiere Artikel in sinnvolle Abschnitte
-            const ranges = [
-              { title: "Allgemeine Bestimmungen", start: 1, end: 10 },
-              { title: "Hauptbestimmungen", start: 11, end: 50 },
-              { title: "Durchführung und Kontrolle", start: 51, end: 80 },
-              { title: "Schlussbestimmungen", start: 81, end: 200 }
-            ];
-            
-            ranges.forEach((range, index) => {
-              const sectionArticles = articles.filter(art => {
-                const num = parseInt(art.number);
-                return num >= range.start && num <= range.end;
-              });
+            if [ "$size" -gt 10000 ]; then
+              echo "  ✅ $name: ${size} Bytes erfolgreich geladen"
               
-              if (sectionArticles.length > 0) {
-                articleData.sections.push({
-                  number: index + 1,
-                  title: range.title,
-                  items: sectionArticles
-                });
-              }
-            });
-          } else {
-            // Fallback-Struktur
-            articleData.sections.push({
-              number: 1,
-              title: "EU-Verordnung",
-              items: [
-                {
-                  number: "1",
-                  title: "Gegenstand und Anwendungsbereich",
-                  content: `<div class="eu-article">
-                    <h3>Artikel 1 - Gegenstand und Anwendungsbereich</h3>
-                    <p><strong>${name}</strong></p>
-                    <p>Diese Verordnung legt Vorschriften fest...</p>
-                    <p><a href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:${celex}" target="_blank">Volltext auf EUR-Lex</a></p>
-                  </div>`,
-                  type: 'article'
-                }
-              ]
-            });
-          }
-          
-          fs.writeFileSync(jsonFile, JSON.stringify(articleData, null, 2));
-          console.log(`  ✅ JSON erstellt: ${jsonFile}`);
-          
-        } catch (error) {
-          console.error(`  ❌ Fehler bei ${lawId}:`, error.message);
-          process.exit(1);
-        }
-        EUEOF
-        
-        # Deutsche Gesetze Prozessor
-        cat > process_german_law.js << 'DEEOF'
-        const fs = require('fs');
-        
-        const [lawId, name, shortName, baseUrl, rawFile, jsonFile] = process.argv.slice(2);
-        
-        try {
-          const html = fs.readFileSync(rawFile, 'utf8');
-          
-          const lawData = {
-            id: lawId,
-            name: name,
-            shortName: shortName,
-            type: 'german-law',
-            lastUpdate: new Date().toISOString().split('T')[0],
-            sections: []
-          };
-          
-          // Extrahiere Paragraphen aus Tabellen
-          const tableMatches = html.match(/<table[^>]*>(.*?)<\/table>/gs);
-          
-          if (tableMatches) {
-            const paragraphs = [];
-            
-            for (const table of tableMatches) {
-              const rowMatches = table.match(/<tr[^>]*>(.*?)<\/tr>/gs) || [];
-              
-              for (const row of rowMatches) {
-                const cellMatches = row.match(/<td[^>]*>(.*?)<\/td>/gs);
+              # Verarbeite HTML zu JSON
+              node -e "
+                const fs = require('fs');
+                const html = fs.readFileSync('$raw_file', 'utf8');
                 
-                if (cellMatches && cellMatches.length >= 2) {
-                  const paraCell = cellMatches[0].replace(/<[^>]*>/g, '').trim();
-                  const titleCell = cellMatches[1].replace(/<[^>]*>/g, '').trim();
+                // Extrahiere Paragraphen aus dem HTML
+                const paragraphs = [];
+                
+                // Suche nach Paragraphen-Mustern
+                const paraRegex = /(?:<div[^>]*class[^>]*(?:jnhtml|jurAbsatz)[^>]*>|<p[^>]*>)([^<]*§\s*(\d+[a-z]?)[^<]*)/gi;
+                let match;
+                
+                while ((match = paraRegex.exec(html)) !== null) {
+                  const fullText = match[1] || match[0];
+                  const paraNumber = match[2];
                   
-                  if (paraCell.startsWith('§')) {
-                    const paraNumber = paraCell.replace('§', '').trim();
-                    const baseNumber = parseInt(paraNumber.match(/\d+/)?.[0] || '0');
+                  if (paraNumber && fullText.length > 10) {
+                    // Extrahiere Titel (Text nach dem Paragraphen)
+                    const titleMatch = fullText.match(/§\s*\d+[a-z]?\s*(.+?)(?:\n|$)/);
+                    const title = titleMatch ? titleMatch[1].trim().substring(0, 100) : 'Paragraph ' + paraNumber;
                     
                     paragraphs.push({
                       number: paraNumber,
-                      title: titleCell || `Paragraph ${paraNumber}`,
-                      baseNumber: baseNumber,
-                      content: `<div class="jnhtml">
-                        <h3>§ ${paraNumber} ${name}</h3>
-                        <p><strong>${titleCell}</strong></p>
-                        <p>Vollständiger Paragraph-Text aus dem ${name}.</p>
-                        <p><em>Bei Bedarf wird der komplette Inhalt nachgeladen.</em></p>
-                        <p><a href="https://www.gesetze-im-internet.de/${baseUrl}/__${paraNumber.replace(/\s+/g, '_')}.html" target="_blank">§ ${paraNumber} vollständig lesen</a></p>
-                      </div>`,
+                      title: title,
+                      content: \`<div class=\"jnhtml\">
+                        <h3>§ \${paraNumber} $name</h3>
+                        <p><strong>\${title}</strong></p>
+                        <p>Vollständiger Paragraph-Text aus dem $name.</p>
+                        <p><a href=\"$url\" target=\"_blank\">§ \${paraNumber} im Volltext lesen</a></p>
+                      </div>\`,
                       type: 'paragraph'
                     });
                   }
                 }
-              }
-            }
-            
-            if (paragraphs.length > 0) {
-              console.log(`  📊 ${paragraphs.length} Paragraphen gefunden`);
-              
-              // Gruppiere in logische Abschnitte
-              const sections = [
-                { title: "Allgemeine Bestimmungen", start: 1, end: 10 },
-                { title: "Hauptbestimmungen", start: 11, end: 30 },
-                { title: "Durchführung und Kontrolle", start: 31, end: 60 },
-                { title: "Schlussbestimmungen", start: 61, end: 999 }
-              ];
-              
-              sections.forEach((section, index) => {
-                const sectionParas = paragraphs.filter(p => 
-                  p.baseNumber >= section.start && p.baseNumber <= section.end
-                );
                 
-                if (sectionParas.length > 0) {
-                  lawData.sections.push({
-                    number: index + 1,
-                    title: section.title,
-                    items: sectionParas.sort((a, b) => a.baseNumber - b.baseNumber)
+                // Wenn keine Paragraphen gefunden, versuche allgemeine Text-Extraktion
+                if (paragraphs.length === 0) {
+                  console.log('  ⚠️ Keine Paragraphen-Struktur gefunden, erstelle Volltext-Verweis');
+                  paragraphs.push({
+                    number: '1',
+                    title: 'Volltext verfügbar',
+                    content: \`<div class=\"jnhtml\">
+                      <h3>$name</h3>
+                      <p>Der vollständige Text ist verfügbar unter:</p>
+                      <p><a href=\"$url\" target=\"_blank\">Volltext auf gesetze-im-internet.de lesen</a></p>
+                    </div>\`,
+                    type: 'paragraph'
                   });
                 }
-              });
-            }
-          }
-          
-          // Fallback wenn keine Paragraphen gefunden
-          if (lawData.sections.length === 0) {
-            lawData.sections.push({
-              number: 1,
-              title: "Gesetzesinhalt",
-              items: [
-                {
-                  number: "1",
-                  title: "Volltext verfügbar",
-                  content: `<div class="jnhtml">
-                    <h3>${name}</h3>
-                    <p>Der vollständige Text ist verfügbar unter:</p>
-                    <p><a href="https://www.gesetze-im-internet.de/${baseUrl}/" target="_blank">Gesetze-im-Internet öffnen</a></p>
-                    <p><a href="https://www.buzer.de/gesetz/${baseUrl}/" target="_blank">Auf Buzer.de durchsuchen</a></p>
-                  </div>`,
-                  type: 'paragraph'
-                }
-              ]
-            });
-          }
-          
-          fs.writeFileSync(jsonFile, JSON.stringify(lawData, null, 2));
-          console.log(`  ✅ JSON erstellt: ${jsonFile}`);
-          
-        } catch (error) {
-          console.error(`  ❌ Fehler bei ${lawId}:`, error.message);
-          
-          // Fallback JSON erstellen
-          const fallbackData = {
-            id: lawId,
-            name: name,
-            shortName: shortName,
-            type: 'german-law',
-            lastUpdate: new Date().toISOString().split('T')[0],
-            sections: [
-              {
-                number: 1,
-                title: "Gesetz (Fallback)",
-                items: [
-                  {
-                    number: "1",
-                    title: "Volltext verfügbar",
-                    content: `<div class="jnhtml">
-                      <h3>${name}</h3>
-                      <p><a href="https://www.gesetze-im-internet.de/${baseUrl}/" target="_blank">Gesetze-im-Internet öffnen</a></p>
-                    </div>`,
-                    type: 'paragraph'
-                  }
-                ]
-              }
-            ]
-          };
-          
-          fs.writeFileSync(jsonFile, JSON.stringify(fallbackData, null, 2));
-          console.log(`  📄 Fallback JSON erstellt: ${jsonFile}`);
-        }
-        DEEOF
-        
-        echo "✅ Node.js Prozessor-Skripte erstellt"
-
-    - name: 🇪🇺 EU-Verordnungen laden und verarbeiten
-      run: |
-        echo "🔗 Lade und verarbeite EU-Verordnungen..."
-        
-        process_eu_law() {
-          local law_id="$1"
-          local name="$2" 
-          local celex="$3"
-          local lang="${4:-DE}"
-          
-          echo "📄 Verarbeite: $name"
-          
-          local url="https://eur-lex.europa.eu/legal-content/${lang}/TXT/HTML/?uri=CELEX:${celex}"
-          local raw_file="laws/raw/${law_id}.html"
-          local json_file="laws/data/${law_id}.json"
-          
-          # Download mit erweiterten Optionen
-          if curl -L -A "Mozilla/5.0 (compatible; LawBot/1.0)" \
-               --connect-timeout 30 \
-               --max-time 180 \
-               --retry 3 \
-               --retry-delay 5 \
-               -H "Accept: text/html,application/xhtml+xml" \
-               -H "Accept-Language: ${lang}-${lang},${lang};q=0.9" \
-               -o "$raw_file" \
-               "$url"; then
-            
-            local size=$(stat -c%s "$raw_file" 2>/dev/null || stat -f%z "$raw_file" 2>/dev/null || echo "0")
-            
-            if [ "$size" -gt 100000 ]; then
-              echo "  ✅ $name: ${size} Bytes heruntergeladen"
-              
-              # Verarbeite mit Node.js-Skript
-              node process_eu_law.js "$law_id" "$name" "$raw_file" "$json_file" "$celex"
+                
+                // Erstelle JSON-Struktur
+                const lawData = {
+                  id: '$law_id',
+                  name: '$name',
+                  shortName: '$short_name',
+                  type: 'german-law',
+                  lastUpdate: new Date().toISOString().split('T')[0],
+                  sourceUrl: '$url',
+                  sections: [
+                    {
+                      number: 1,
+                      title: paragraphs.length > 1 ? 'Paragraphen' : 'Gesetzesinhalt',
+                      items: paragraphs.slice(0, 50) // Maximal 50 Paragraphen
+                    }
+                  ]
+                };
+                
+                fs.writeFileSync('$json_file', JSON.stringify(lawData, null, 2));
+                console.log(\`  📄 JSON erstellt: \${paragraphs.length} Paragraphen\`);
+              "
               
             else
-              echo "  ⚠️ $name: ${size} Bytes (zu klein)"
-              create_fallback_eu_json "$law_id" "$name" "$celex" "$json_file"
+              echo "  ⚠️ $name: Datei zu klein (${size} Bytes)"
+              create_fallback_law "$law_id" "$name" "$short_name" "$url"
             fi
           else
             echo "  ❌ $name: Download fehlgeschlagen"
-            create_fallback_eu_json "$law_id" "$name" "$celex" "$json_file"
+            create_fallback_law "$law_id" "$name" "$short_name" "$url"
           fi
-        }
+        done
         
-        create_fallback_eu_json() {
+        # Fallback-Funktion
+        create_fallback_law() {
           local law_id="$1"
           local name="$2"
-          local celex="$3"
-          local json_file="$4"
+          local short_name="$3"
+          local url="$4"
+          local json_file="laws/data/${law_id}.json"
           
           cat > "$json_file" << EOF
         {
           "id": "$law_id",
           "name": "$name",
-          "type": "eu-regulation",
-          "lastUpdate": "$(date +'%Y-%m-%d')",
-          "sections": [
-            {
-              "number": 1,
-              "title": "EU-Verordnung (Fallback)",
-              "items": [
-                {
-                  "number": "1",
-                  "title": "Volltext auf EUR-Lex",
-                  "content": "<div class=\"eu-article\"><h3>$name</h3><p>Der vollständige Text ist verfügbar unter:</p><p><a href=\"https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:$celex\" target=\"_blank\">EUR-Lex öffnen</a></p></div>",
-                  "type": "article"
-                }
-              ]
-            }
-          ]
-        }
-        EOF
-          echo "  📄 Fallback JSON erstellt: $json_file"
-        }
-        
-        # EU-Verordnungen verarbeiten
-        process_eu_law "eu_aml_2024" "EU-Geldwäscheverordnung 2024" "32024R1624" "DE"
-        process_eu_law "eu_ai_act_2024" "EU-KI-Verordnung (AI Act)" "32024R1689" "DE" 
-        process_eu_law "eu_gdpr" "EU-Datenschutz-Grundverordnung" "32016R0679" "DE"
-        
-        echo "✅ EU-Verordnungen verarbeitet"
-
-    - name: 🏛️ Deutsche Gesetze laden und verarbeiten
-      run: |
-        echo "🔗 Lade und verarbeite deutsche Gesetze..."
-        
-        process_german_law() {
-          local law_id="$1"
-          local name="$2"
-          local short_name="$3"
-          local base_url="$4"
-          
-          echo "📄 Verarbeite: $name"
-          
-          local toc_url="https://www.gesetze-im-internet.de/${base_url}/inhalts_bersicht.html"
-          local raw_file="laws/raw/${law_id}.html"
-          local json_file="laws/data/${law_id}.json"
-          
-          # Versuche Inhaltsverzeichnis zu laden
-          if curl -L -A "Mozilla/5.0 (compatible; LawBot/1.0)" \
-               --connect-timeout 20 \
-               --max-time 60 \
-               --retry 2 \
-               -H "Accept: text/html" \
-               -o "$raw_file" \
-               "$toc_url" 2>/dev/null; then
-            
-            local size=$(stat -c%s "$raw_file" 2>/dev/null || stat -f%z "$raw_file" 2>/dev/null || echo "0")
-            
-            if [ "$size" -gt 5000 ]; then
-              echo "  ✅ $name: ${size} Bytes heruntergeladen"
-              
-              # Verarbeite mit Node.js-Skript
-              node process_german_law.js "$law_id" "$name" "$short_name" "$base_url" "$raw_file" "$json_file"
-              
-            else
-              echo "  ⚠️ $name: ${size} Bytes (zu klein)"
-              create_fallback_german_json "$law_id" "$name" "$short_name" "$base_url"
-            fi
-          else
-            echo "  ❌ $name: Download fehlgeschlagen"
-            create_fallback_german_json "$law_id" "$name" "$short_name" "$base_url"
-          fi
-        }
-        
-        create_fallback_german_json() {
-          local law_id="$1"
-          local name="$2"
-          local short_name="$3"
-          local base_url="$4"
-          local json_file="laws/data/${law_id}.json"
-          
-          cat > "$json_file" << EOF
-        {
-          "id": "$law_id",
-          "name": "$name", 
           "shortName": "$short_name",
           "type": "german-law",
           "lastUpdate": "$(date +'%Y-%m-%d')",
+          "sourceUrl": "$url",
           "sections": [
             {
               "number": 1,
-              "title": "Gesetz (Weiterleitung)",
+              "title": "Volltext verfügbar",
               "items": [
                 {
                   "number": "1",
-                  "title": "Volltext verfügbar",
-                  "content": "<div class=\"jnhtml\"><h3>$name</h3><p>Der vollständige Text ist verfügbar unter:</p><p><a href=\"https://www.gesetze-im-internet.de/$base_url/\" target=\"_blank\">Gesetze-im-Internet öffnen</a></p><p><a href=\"https://www.buzer.de/gesetz/$base_url/\" target=\"_blank\">Auf Buzer.de durchsuchen</a></p></div>",
+                  "title": "Direktlink zum Gesetz",
+                  "content": "<div class=\"jnhtml\"><h3>$name</h3><p>Der vollständige Text ist verfügbar unter:</p><p><a href=\"$url\" target=\"_blank\">$name vollständig lesen</a></p></div>",
                   "type": "paragraph"
                 }
               ]
@@ -429,97 +182,95 @@ jobs:
           ]
         }
         EOF
-          echo "  📄 Fallback JSON erstellt: $json_file"
+          echo "  📄 Fallback JSON erstellt für $name"
         }
-        
-        # Deutsche Gesetze verarbeiten
-        process_german_law "gwg_2017" "Geldwäschegesetz (GwG)" "GwG" "gwg_2017"
-        process_german_law "kredwg" "Kreditwesengesetz (KWG)" "KWG" "kredwg"
-        process_german_law "zag_2018" "Zahlungsdiensteaufsichtsgesetz (ZAG)" "ZAG" "zag_2018"
-        process_german_law "awg_2013" "Außenwirtschaftsgesetz (AWG)" "AWG" "awg_2013"
-        
-        echo "✅ Deutsche Gesetze verarbeitet"
 
-    - name: 📊 Metadaten und Statistiken erstellen
+    - name: 🇪🇺 EU-Verordnungen laden (vereinfacht)
       run: |
-        echo "📊 Erstelle Metadaten..."
+        echo "🔗 Lade EU-Verordnungen von EUR-Lex..."
         
-        total_laws=0
-        total_sections=0
-        total_items=0
+        # EU-Verordnungen mit CELEX-Nummern
+        declare -A EU_LAWS=(
+          ["eu_gdpr"]="EU-Datenschutz-Grundverordnung|DSGVO|32016R0679"
+          ["eu_aml_2024"]="EU-Geldwäscheverordnung 2024|EU-GwVO|32024R1624"
+          ["eu_ai_act_2024"]="EU-KI-Verordnung|EU-KI-VO|32024R1689"
+        )
         
-        eu_laws=0
-        german_laws=0
-        
-        for json_file in laws/data/*.json; do
-          if [ -f "$json_file" ]; then
-            total_laws=$((total_laws + 1))
+        for law_id in "${!EU_LAWS[@]}"; do
+          IFS='|' read -r name short_name celex <<< "${EU_LAWS[$law_id]}"
+          
+          echo "📄 Lade: $name"
+          
+          url="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:${celex}"
+          raw_file="laws/raw/${law_id}.html"
+          json_file="laws/data/${law_id}.json"
+          
+          if curl -L -A "Mozilla/5.0 (compatible; EURlexBot/1.0)" \
+               --connect-timeout 30 \
+               --max-time 60 \
+               --retry 2 \
+               -H "Accept: text/html" \
+               -H "Accept-Language: de-DE,de;q=0.9" \
+               -o "$raw_file" \
+               "$url"; then
             
-            # Zähle Abschnitte und Items mit jq
-            if command -v jq >/dev/null 2>&1; then
-              sections=$(jq '.sections | length' "$json_file" 2>/dev/null || echo "0")
-              total_sections=$((total_sections + sections))
+            size=$(stat -c%s "$raw_file" 2>/dev/null || stat -f%z "$raw_file" 2>/dev/null || echo "0")
+            
+            if [ "$size" -gt 50000 ]; then
+              echo "  ✅ $name: ${size} Bytes"
               
-              items=$(jq '[.sections[].items | length] | add' "$json_file" 2>/dev/null || echo "0")
-              total_items=$((total_items + items))
-              
-              # Typ-spezifische Zählung
-              type=$(jq -r '.type' "$json_file" 2>/dev/null || echo "unknown")
-              if [ "$type" = "eu-regulation" ]; then
-                eu_laws=$((eu_laws + 1))
-              elif [ "$type" = "german-law" ]; then
-                german_laws=$((german_laws + 1))
-              fi
-              
-              name=$(jq -r '.name' "$json_file" 2>/dev/null || echo "Unbekannt")
-              echo "  📄 $name: $sections Abschnitte, $items Items"
+              # Vereinfachte EU-Verarbeitung
+              cat > "$json_file" << EOF
+        {
+          "id": "$law_id",
+          "name": "$name",
+          "shortName": "$short_name",
+          "type": "eu-regulation",
+          "lastUpdate": "$(date +'%Y-%m-%d')",
+          "sourceUrl": "$url",
+          "sections": [
+            {
+              "number": 1,
+              "title": "EU-Verordnung",
+              "items": [
+                {
+                  "number": "1",
+                  "title": "Volltext auf EUR-Lex",
+                  "content": "<div class=\"eu-article\"><h3>$name</h3><p>Der vollständige Text ist verfügbar unter:</p><p><a href=\"$url\" target=\"_blank\">$name auf EUR-Lex lesen</a></p><p><em>CELEX-Nr.: $celex</em></p></div>",
+                  "type": "article"
+                }
+              ]
+            }
+          ]
+        }
+        EOF
             else
-              echo "  📄 $(basename "$json_file"): JSON verarbeitet (jq nicht verfügbar)"
-              total_sections=$((total_sections + 1))
-              total_items=$((total_items + 1))
+              echo "  ⚠️ $name: Zu klein (${size} Bytes)"
             fi
+          else
+            echo "  ❌ $name: Download fehlgeschlagen"
           fi
         done
+
+    - name: 📊 Metadaten erstellen
+      run: |
+        total_laws=$(ls laws/data/*.json 2>/dev/null | wc -l)
         
-        timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-        
-        cat > laws/metadata.json << META_EOF
+        cat > laws/metadata.json << EOF
         {
-          "lastUpdate": "$timestamp",
-          "version": "3.0.0",
-          "type": "complete-database",
-          "statistics": {
-            "totalLaws": $total_laws,
-            "totalSections": $total_sections,
-            "totalItems": $total_items,
-            "byType": {
-              "euRegulations": $eu_laws,
-              "germanLaws": $german_laws
-            }
-          },
-          "dataFormat": "embedded-json",
-          "features": [
-            "Volltext-Suche",
-            "Automatische Zitierung", 
-            "Offline-fähig",
-            "CORS-frei",
-            "Responsive Design"
+          "lastUpdate": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
+          "version": "4.0.0-simplified",
+          "totalLaws": $total_laws,
+          "strategy": "direct-download",
+          "sources": [
+            "gesetze-im-internet.de (deutsche Gesetze)",
+            "eur-lex.europa.eu (EU-Verordnungen)"
           ],
-          "nextUpdate": "$(date -u -d '+1 day' +'%Y-%m-%dT04:00:00Z')",
-          "buildInfo": {
-            "workflow": "complete-database-v3",
-            "githubActions": "https://github.com/${{ github.repository }}/actions"
-          }
+          "nextUpdate": "$(date -u -d '+1 day' +'%Y-%m-%dT04:00:00Z')"
         }
-        META_EOF
+        EOF
         
-        echo ""
-        echo "🎯 DATENBANK ERFOLGREICH ERSTELLT:"
-        echo "  📚 Gesetze: $total_laws"
-        echo "  📑 Abschnitte: $total_sections" 
-        echo "  📄 Items: $total_items"
-        echo "  🇪🇺 EU-Verordnungen: $eu_laws"
-        echo "  🏛️ Deutsche Gesetze: $german_laws"
+        echo "✅ Vereinfachte Datenbank erstellt: $total_laws Gesetze"
 
     - name: 💾 Commit und Push
       run: |
@@ -528,42 +279,39 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "Gesetzes-Navigator Bot"
           
-          total_files=$(ls laws/data/*.json 2>/dev/null | wc -l)
+          total=$(ls laws/data/*.json 2>/dev/null | wc -l)
           
-          git commit -m "📚 Vollständige Gesetzes-Datenbank: $(date +'%Y-%m-%d %H:%M')
+          git commit -m "📚 Vereinfachte Gesetzes-Datenbank: $(date +'%Y-%m-%d')
 
-        🎯 VOLLSTÄNDIGE DATEN-PIPELINE:
-        📊 Gesetze verarbeitet: $total_files
-        📁 JSON-Dateien: laws/data/
-        📋 Metadaten: laws/metadata.json
+        ✅ STRATEGIE: Direkter Download von offiziellen Quellen
+        📊 Gesetze verarbeitet: $total
+        🎯 Zuverlässig und einfach zu warten
         
-        ✅ FEATURES:
-        • Strukturierte JSON-Daten für alle Gesetze
-        • Echte Inhalte (wo verfügbar) + Fallbacks
-        • Bereit für CORS-freie Web-App Integration
-        • Offline-fähige Datenbank
-        
-        🔗 Datenbank bereit für GitHub Pages!"
+        Quellen:
+        • Deutsche Gesetze: gesetze-im-internet.de
+        • EU-Verordnungen: eur-lex.europa.eu"
           
           git push
-          echo "✅ Vollständige Datenbank committed und gepusht!"
+          echo "✅ Änderungen committed und gepusht!"
         else
-          echo "ℹ️ Keine Änderungen zu committen"
+          echo "ℹ️ Keine Änderungen"
         fi
 
     - name: 🎯 Erfolgs-Zusammenfassung
       run: |
         echo ""
-        echo "🚀 ===== GESETZES-NAVIGATOR DATENBANK ERFOLGREICH ====="
-        echo ""
-        echo "🎯 STRATEGIE: Strukturierte JSON-Datenbank"
-        echo "✅ VERFÜGBARKEIT: 100% für CORS-freie Web-App"
-        echo "🔄 QUALITÄT: Echte Inhalte + intelligente Fallbacks"
+        echo "🚀 ===== VEREINFACHTER GESETZES-NAVIGATOR ERFOLGREICH ====="
         echo ""
         echo "📊 ERGEBNIS:"
-        echo "  📚 JSON-Dateien: $(ls laws/data/*.json 2>/dev/null | wc -l)"
-        echo "  📋 Metadaten: laws/metadata.json"
-        echo "  🔧 Bereit für Web-App Integration"
+        total_files=$(ls laws/data/*.json 2>/dev/null | wc -l)
+        echo "  📚 Gesetze geladen: $total_files"
+        echo "  📋 Metadaten: laws/metadata.json erstellt"
+        echo "  🎯 Strategie: Direkte Downloads von offiziellen Quellen"
         echo ""
-        echo "🔗 Nächster Schritt: index.html mit eingebetteten Daten erstellen"
-        echo "🎯 Alle CORS-Probleme werden gelöst!"
+        echo "📄 GELADENE DATEIEN:"
+        for file in laws/data/*.json; do
+          if [ -f "$file" ]; then
+            name=$(basename "$file" .json)
+            size=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file" 2>/dev/null || echo "0")
+            echo "  ✅ $name: ${size} Bytes"
+          fi
