@@ -3,18 +3,24 @@
   "name": "Kreditwesengesetz",
   "shortName": "KWG",
   "type": "german-law",
-  "lastUpdate": "2025-07-04",
-  "sourceUrl": "https://de.openlegaldata.io",
-  "dataSource": "openlegaldata-api",
+  "lastUpdate": "2025-07-05",
+  "sourceUrl": "https://www.gesetze-im-internet.de/",
+  "dataSource": "smart-fallback",
   "sections": [
     {
       "number": 1,
-      "title": "Gesetz",
+      "title": "Mehrere Quellen verfügbar",
       "items": [
         {
           "number": "1",
-          "title": "Kreditwesengesetz",
-          "content": "<div class=\"jnhtml\">\n              <h3>Kreditwesengesetz</h3>\n              <p><strong>Kreditwesengesetz</strong></p>\n              <p>Gesetzestext verfügbar über OpenLegalData.</p>\n              <p><a href=\"https://de.openlegaldata.io\" target=\"_blank\">Volltext lesen</a></p>\n            </div>",
+          "title": "Offizielle Quelle",
+          "content": "<div class=\"jnhtml\"><h3>Kreditwesengesetz - Offizielle Quellen</h3><ul><li><a href=\"https://www.gesetze-im-internet.de/\" target=\"_blank\">Gesetze im Internet (BMJ)</a></li><li><a href=\"https://www.buzer.de/\" target=\"_blank\">Buzer.de (durchsuchbar)</a></li><li><a href=\"https://dejure.org/\" target=\"_blank\">dejure.org (mit Kommentaren)</a></li><li><a href=\"https://www.gesetze-bayern.de/\" target=\"_blank\">Gesetze Bayern</a></li></ul></div>",
+          "type": "paragraph"
+        },
+        {
+          "number": "2", 
+          "title": "API-Zugang",
+          "content": "<div class=\"jnhtml\"><h3>Programmatischer Zugang</h3><ul><li><a href=\"https://de.openlegaldata.io/\" target=\"_blank\">OpenLegalData.io API</a></li><li><a href=\"https://github.com/bundestag/gesetze\" target=\"_blank\">Bundestag GitHub Repository</a></li><li><a href=\"https://offenegesetze.de/\" target=\"_blank\">OffeneGesetze.de</a></li></ul></div>",
           "type": "paragraph"
         }
       ]
