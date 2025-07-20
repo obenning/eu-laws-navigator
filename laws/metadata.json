@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-07-19T04:26:16Z",
+  "lastUpdate": "2025-07-20T04:36:56Z",
   "version": "5.0.0-bot-resistant",
   "buildStrategy": "multi-source-with-fallbacks",
   "botResistance": {
@@ -50,7 +50,7 @@
     "apiAccess": true,
     "offlineCapable": true
   },
-  "nextUpdate": "2025-07-20T04:00:00Z",
+  "nextUpdate": "2025-07-21T04:00:00Z",
   "troubleshooting": {
     "commonIssues": "Bot-blocking von offiziellen Websites",
     "solutions": "Alternative APIs und Repositories nutzen",
