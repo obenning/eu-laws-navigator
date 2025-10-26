@@ -3,24 +3,18 @@
   "name": "Geldwäschegesetz",
   "shortName": "GwG",
   "type": "german-law",
-  "lastUpdate": "2025-10-25",
-  "sourceUrl": "https://www.gesetze-im-internet.de/",
-  "dataSource": "smart-fallback",
+  "lastUpdate": "2025-10-26",
+  "sourceUrl": "https://de.openlegaldata.io",
+  "dataSource": "openlegaldata-api",
   "sections": [
     {
       "number": 1,
-      "title": "Mehrere Quellen verfügbar",
+      "title": "Gesetz",
       "items": [
         {
           "number": "1",
-          "title": "Offizielle Quelle",
-          "content": "<div class=\"jnhtml\"><h3>Geldwäschegesetz - Offizielle Quellen</h3><ul><li><a href=\"https://www.gesetze-im-internet.de/\" target=\"_blank\">Gesetze im Internet (BMJ)</a></li><li><a href=\"https://www.buzer.de/\" target=\"_blank\">Buzer.de (durchsuchbar)</a></li><li><a href=\"https://dejure.org/\" target=\"_blank\">dejure.org (mit Kommentaren)</a></li><li><a href=\"https://www.gesetze-bayern.de/\" target=\"_blank\">Gesetze Bayern</a></li></ul></div>",
-          "type": "paragraph"
-        },
-        {
-          "number": "2", 
-          "title": "API-Zugang",
-          "content": "<div class=\"jnhtml\"><h3>Programmatischer Zugang</h3><ul><li><a href=\"https://de.openlegaldata.io/\" target=\"_blank\">OpenLegalData.io API</a></li><li><a href=\"https://github.com/bundestag/gesetze\" target=\"_blank\">Bundestag GitHub Repository</a></li><li><a href=\"https://offenegesetze.de/\" target=\"_blank\">OffeneGesetze.de</a></li></ul></div>",
+          "title": "Geldwäschegesetz",
+          "content": "<div class=\"jnhtml\">\n              <h3>Geldwäschegesetz</h3>\n              <p><strong>Geldwäschegesetz</strong></p>\n              <p>Gesetzestext verfügbar über OpenLegalData.</p>\n              <p><a href=\"https://de.openlegaldata.io\" target=\"_blank\">Volltext lesen</a></p>\n            </div>",
           "type": "paragraph"
         }
       ]
