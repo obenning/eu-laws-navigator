@@ -3,7 +3,7 @@
   "name": "Strafgesetzbuch",
   "shortName": "StGB",
   "type": "german-law",
-  "lastUpdate": "2025-11-01",
+  "lastUpdate": "2025-11-02",
   "sourceUrl": "https://de.openlegaldata.io",
   "dataSource": "openlegaldata-api",
   "sections": [
