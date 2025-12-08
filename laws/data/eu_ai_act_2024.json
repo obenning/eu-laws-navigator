@@ -3,9 +3,9 @@
   "name": "EU-KI-Verordnung",
   "shortName": "EU-KI-VO",
   "type": "eu-regulation",
-  "lastUpdate": "2025-12-07",
+  "lastUpdate": "2025-12-08",
   "sourceUrl": "https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32024R1689",
-  "dataSource": "eur-lex-fallback",
+  "dataSource": "eur-lex",
   "sections": [
     {
       "number": 1,
@@ -14,7 +14,7 @@
         {
           "number": "1",
           "title": "Volltext auf EUR-Lex",
-          "content": "<div class=\"eu-article\"><h3>EU-KI-Verordnung</h3><p>Der vollständige Text ist verfügbar unter:</p><p><a href=\"https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32024R1689\" target=\"_blank\">EU-KI-Verordnung auf EUR-Lex lesen</a></p><p><em>CELEX-Nr.: 32024R1689</em></p></div>",
+          "content": "<div class=\"eu-article\">\n              <h3>EU-KI-Verordnung</h3>\n              <p>Der vollständige Text ist verfügbar unter:</p>\n              <p><a href=\"https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32024R1689\" target=\"_blank\">EU-KI-Verordnung auf EUR-Lex lesen</a></p>\n              <p><em>CELEX-Nr.: 32024R1689</em></p>\n            </div>",
           "type": "article"
         }
       ]
