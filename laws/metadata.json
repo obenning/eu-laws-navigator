@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2025-12-23T04:32:22Z",
+  "lastUpdate": "2025-12-24T04:30:38Z",
   "version": "5.0.0-bot-resistant",
   "buildStrategy": "multi-source-with-fallbacks",
   "botResistance": {
@@ -9,9 +9,9 @@
   },
   "statistics": {
     "totalLaws": 9,
-    "successfulDownloads": 6,
-    "smartFallbacks": 3,
-    "successRate": "66.6%",
+    "successfulDownloads": 9,
+    "smartFallbacks": 0,
+    "successRate": "100.0%",
     "reliabilityScore": "high"
   },
   "dataSources": [
@@ -50,7 +50,7 @@
     "apiAccess": true,
     "offlineCapable": true
   },
-  "nextUpdate": "2025-12-24T04:00:00Z",
+  "nextUpdate": "2025-12-25T04:00:00Z",
   "troubleshooting": {
     "commonIssues": "Bot-blocking von offiziellen Websites",
     "solutions": "Alternative APIs und Repositories nutzen",
